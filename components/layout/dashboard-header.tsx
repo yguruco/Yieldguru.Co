@@ -11,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
 interface DashboardHeaderProps {
   dashboardType: string
   accentColor: string
@@ -45,6 +44,7 @@ export function DashboardHeader({ dashboardType, accentColor, toggleSidebar }: D
     </header>
   )
 }
+
 
 function NotificationsButton() {
   return (

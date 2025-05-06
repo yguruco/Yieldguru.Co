@@ -15,7 +15,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Progress } from "@/components/ui/progress"
 import { v4 as uuidv4 } from "uuid"
-import {ConnectAndSIWE} from "../../../../components/onchainKit/ConnectAndSIWE"
+import { WalletComponents } from "../../../../components/onchainKit/wallet"
+import { MintNFT } from "@/components/AdminNFT"
 
 
 interface MarketplaceAsset {
@@ -609,12 +610,16 @@ export default function TokenizePage() {
                           <Shield className="mr-2 h-4 w-4" />
                           Tokenize Asset
                         </Button>
+                        
                       )}
+                      <WalletComponents />
+                      <MintNFT />
                     </div>
-                    <ConnectAndSIWE />
 
                   </div>
+                  
                 </div>
+                
               )}
             </CardContent>
           </Card>
