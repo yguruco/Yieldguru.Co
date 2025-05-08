@@ -20,6 +20,7 @@ export interface VehicleDetails {
 }
 
 export interface RFTSubmission {
+  _id?: string
   vehicleDetails: VehicleDetails
   facialScanData: string
   vehicleImages: string[]
@@ -33,6 +34,7 @@ export interface RFTSubmission {
 
 export interface AssetCard {
   id: string
+  _id?: string
   vehicleName: string
   vehicleImage: string
   operatorName: string

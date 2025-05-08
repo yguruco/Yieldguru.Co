@@ -32,14 +32,18 @@ export default function RFTApprovalsPage() {
   const [feedbackComment, setFeedbackComment] = useState("")
 
   useEffect(() => {
-    // In a real app, this would be an API call
-    const fetchSubmissions = () => {
+    const fetchSubmissions = async () => {
       setLoading(true)
 
       try {
-        // Get submissions from local storage (for demo purposes)
-        const storedSubmissions = localStorage.getItem("rftSubmissions")
-        const parsedSubmissions: RFTSubmission[] = storedSubmissions ? JSON.parse(storedSubmissions) : []
+        // Fetch submissions from the API
+        const response = await fetch('/api/submissions')
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`)
+        }
+
+        const parsedSubmissions: RFTSubmission[] = await response.json()
 
         setSubmissions(parsedSubmissions)
         applyFilters(parsedSubmissions, currentFilter, searchQuery)
@@ -86,70 +90,106 @@ export default function RFTApprovalsPage() {
     applyFilters(submissions, currentFilter, query)
   }
 
-  const approveSubmission = (submission: RFTSubmission) => {
+  const approveSubmission = async (submission: RFTSubmission) => {
     if (!feedbackComment.trim()) {
       alert("Please provide a comment for the approval")
       return
     }
 
-    // Generate a random bytes32 hash (in a real app, this would come from a blockchain transaction)
-    const approvalHash = '0x' + Math.random().toString(16).slice(2).padEnd(64, '0')
+    try {
+      // Generate a random bytes32 hash (in a real app, this would come from a blockchain transaction)
+      const approvalHash = '0x' + Math.random().toString(16).slice(2).padEnd(64, '0')
 
-    // Update the submission
-    const updatedSubmission: RFTSubmission = {
-      ...submission,
-      status: "approved",
-      approvalDate: new Date().toISOString(),
-      approvalHash,
-      feedback: feedbackComment,
+      // Update the submission
+      const updatedSubmission: Partial<RFTSubmission> = {
+        status: "approved",
+        approvalDate: new Date().toISOString(),
+        approvalHash,
+        feedback: feedbackComment,
+      }
+
+      // Send the update to the API
+      const response = await fetch(`/api/submissions/${submission._id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedSubmission),
+      })
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`)
+      }
+
+      const updatedSubmissionFromApi = await response.json()
+
+      // Update the submissions array
+      const updatedSubmissions = submissions.map((sub) =>
+        sub._id === submission._id ? updatedSubmissionFromApi : sub,
+      )
+
+      // Update state
+      setSubmissions(updatedSubmissions)
+      applyFilters(updatedSubmissions, currentFilter, searchQuery)
+
+      // Reset feedback
+      setFeedbackComment("")
+
+      // Close the dialog
+      setSelectedSubmission(null)
+    } catch (error) {
+      console.error("Error approving submission:", error)
+      alert("There was an error approving the submission. Please try again.")
     }
-
-    // Update the submissions array
-    const updatedSubmissions = submissions.map((sub) =>
-      sub.vehicleDetails.id === submission.vehicleDetails.id ? updatedSubmission : sub,
-    )
-
-    // Update state and local storage
-    setSubmissions(updatedSubmissions)
-    applyFilters(updatedSubmissions, currentFilter, searchQuery)
-    localStorage.setItem("rftSubmissions", JSON.stringify(updatedSubmissions))
-
-    // Reset feedback
-    setFeedbackComment("")
-
-    // Close the dialog
-    setSelectedSubmission(null)
   }
 
-  const rejectSubmission = (submission: RFTSubmission) => {
+  const rejectSubmission = async (submission: RFTSubmission) => {
     if (!feedbackComment.trim()) {
       alert("Please provide a reason for the rejection")
       return
     }
 
-    // Update the submission
-    const updatedSubmission: RFTSubmission = {
-      ...submission,
-      status: "rejected",
-      approvalDate: new Date().toISOString(),
-      feedback: feedbackComment,
+    try {
+      // Update the submission
+      const updatedSubmission: Partial<RFTSubmission> = {
+        status: "rejected",
+        approvalDate: new Date().toISOString(),
+        feedback: feedbackComment,
+      }
+
+      // Send the update to the API
+      const response = await fetch(`/api/submissions/${submission._id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedSubmission),
+      })
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`)
+      }
+
+      const updatedSubmissionFromApi = await response.json()
+
+      // Update the submissions array
+      const updatedSubmissions = submissions.map((sub) =>
+        sub._id === submission._id ? updatedSubmissionFromApi : sub,
+      )
+
+      // Update state
+      setSubmissions(updatedSubmissions)
+      applyFilters(updatedSubmissions, currentFilter, searchQuery)
+
+      // Reset feedback
+      setFeedbackComment("")
+
+      // Close the dialog
+      setSelectedSubmission(null)
+    } catch (error) {
+      console.error("Error rejecting submission:", error)
+      alert("There was an error rejecting the submission. Please try again.")
     }
-
-    // Update the submissions array
-    const updatedSubmissions = submissions.map((sub) =>
-      sub.vehicleDetails.id === submission.vehicleDetails.id ? updatedSubmission : sub,
-    )
-
-    // Update state and local storage
-    setSubmissions(updatedSubmissions)
-    applyFilters(updatedSubmissions, currentFilter, searchQuery)
-    localStorage.setItem("rftSubmissions", JSON.stringify(updatedSubmissions))
-
-    // Reset feedback
-    setFeedbackComment("")
-
-    // Close the dialog
-    setSelectedSubmission(null)
   }
 
   const formatAddress = (addressString: string) => {

@@ -20,21 +20,23 @@ export default function MyAssetsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // In a real app, this would be an API call
-    const fetchAssets = () => {
+    const fetchAssets = async () => {
       setLoading(true)
 
       try {
-        // Get submissions from local storage (for demo purposes)
-        const storedSubmissions = localStorage.getItem("rftSubmissions")
-        let parsedSubmissions: RFTSubmission[] = storedSubmissions ? JSON.parse(storedSubmissions) : []
+        // Fetch approved submissions from the API
+        const response = await fetch('/api/submissions?status=approved')
 
-        // Filter approved submissions only
-        parsedSubmissions = parsedSubmissions.filter((sub) => sub.status === "approved")
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`)
+        }
+
+        const parsedSubmissions: RFTSubmission[] = await response.json()
 
         // Convert to asset cards
         const assetCards: AssetCard[] = parsedSubmissions.map((sub) => ({
           id: sub.vehicleDetails.id,
+          _id: sub._id,
           vehicleName: `${sub.vehicleDetails.year} ${sub.vehicleDetails.make} ${sub.vehicleDetails.model}`,
           vehicleImage: sub.vehicleImages[0] || "/placeholder.svg?height=200&width=300",
           operatorName: sub.vehicleDetails.ownerName,
