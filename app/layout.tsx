@@ -11,13 +11,19 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "YieldGuru",
   description: "Invest in Emobility",
+  icons: {
+    icon: "/images/YG LOGO.png",
+    apple: "/images/YG LOGO.png",
+  },
 };
 
 export default function RootLayout(props: { children: ReactNode }) {
   return (
     <html lang="en" className={inter.className}>
-      <body>
-        <Providers>{props.children}</Providers>
+      <body className="min-h-screen flex flex-col">
+        <Providers>
+          <div className="flex-grow">{props.children}</div>
+        </Providers>
         <Toaster />
       </body>
     </html>

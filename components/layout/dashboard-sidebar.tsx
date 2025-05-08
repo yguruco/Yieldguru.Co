@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { AnimatePresence, motion } from "framer-motion"
 import { getNavItems } from "@/lib/dashboard-navigation"
@@ -32,7 +33,14 @@ export function DashboardSidebar({ isOpen, dashboardType, accentColor }: Dashboa
           >
             <div className="flex h-16 items-center border-b border-gray-200 px-6">
               <div className="flex items-center gap-2">
-                <div className="h-6 w-6 rounded-full" style={{ backgroundColor: accentColor }} />
+                <div className="relative h-6 w-6 overflow-hidden">
+                  <Image
+                    src="/images/YG LOGO.png"
+                    alt="YieldGuru Logo"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
                 <span className="text-lg font-bold">YieldGuru</span>
               </div>
             </div>
@@ -72,7 +80,14 @@ export function DashboardSidebar({ isOpen, dashboardType, accentColor }: Dashboa
           <SheetContent side="left" className="w-[280px] p-0">
             <div className="flex h-16 items-center border-b border-gray-200 px-6">
               <div className="flex items-center gap-2">
-                <div className="h-6 w-6 rounded-full" style={{ backgroundColor: accentColor }} />
+                <div className="relative h-6 w-6 overflow-hidden">
+                  <Image
+                    src="/images/YG LOGO.png"
+                    alt="YieldGuru Logo"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
                 <span className="text-lg font-bold">YieldGuru</span>
               </div>
             </div>

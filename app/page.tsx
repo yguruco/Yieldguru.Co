@@ -8,6 +8,7 @@ import DashboardSection from "@/components/sections/dashboard-section"
 import FeaturesSection from "@/components/sections/features-section"
 import AssetShowcaseSection from "@/components/sections/asset-showcase-section"
 import TestimonialsSection from "@/components/sections/testimonials-section"
+import FAQSection from "@/components/sections/faq-section"
 import CTASection from "@/components/sections/cta-section"
 import BlogSection from "@/components/sections/blog-section"
 import FooterSection from "@/components/sections/footer-section"
@@ -32,6 +33,7 @@ export default function Home() {
 
       <BlogSection />
       <TestimonialsSection />
+      <FAQSection />
       <FooterSection />
     </div>
   )

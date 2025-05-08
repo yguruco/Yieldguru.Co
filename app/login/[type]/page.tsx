@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowLeft } from "lucide-react"
 import LoginForm from "@/components/login-form"
 
@@ -46,6 +47,16 @@ export default function LoginPage({ params }: { params: { type: string } }) {
         </Link>
 
         <div className="mb-8 text-center">
+          <div className="flex justify-center mb-4">
+            <div className="relative h-16 w-16 overflow-hidden">
+              <Image
+                src="/images/YG LOGO.png"
+                alt="YieldGuru Logo"
+                fill
+                className="object-contain"
+              />
+            </div>
+          </div>
           <h1 className="mb-2 text-3xl font-bold" style={{ color: dashboardInfo.color }}>
             {dashboardInfo.title}
           </h1>

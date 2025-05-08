@@ -3,7 +3,7 @@
 import { ReactNode } from 'react';
 import { OnchainKitProvider } from '@coinbase/onchainkit';
 import { baseSepolia } from 'wagmi/chains';
-import yieldguruLogo from '../../public/images/logo.jpeg';
+import yieldguruLogo from '../../public/images/YG LOGO.png';
 
 
 
@@ -21,8 +21,8 @@ export function Providers({ children }: { children: ReactNode }) {
         },
         wallet: {
           display: 'modal', // 📱 enable the modal ie other wallets
-          termsUrl: 'https://yieldguru.network/', 
-          privacyUrl: 'https://yieldguru.network/', 
+          termsUrl: 'https://yieldguru.network/',
+          privacyUrl: 'https://yieldguru.network/',
         },
       }}
     >

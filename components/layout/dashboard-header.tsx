@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Bell, ChevronDown, LogOut, Menu, Settings, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -34,7 +35,17 @@ export function DashboardHeader({ dashboardType, accentColor, toggleSidebar }: D
         <Button variant="ghost" size="icon" onClick={toggleSidebar} className="hidden lg:flex">
           <Menu className="h-5 w-5" />
         </Button>
-        <h1 className="text-xl font-bold">{dashboardTitle}</h1>
+        <div className="flex items-center gap-2">
+          <div className="relative h-6 w-6 overflow-hidden">
+            <Image
+              src="/images/YG LOGO.png"
+              alt="YieldGuru Logo"
+              fill
+              className="object-contain"
+            />
+          </div>
+          <h1 className="text-xl font-bold">{dashboardTitle}</h1>
+        </div>
       </div>
 
       <div className="flex items-center gap-3">
@@ -59,7 +70,14 @@ function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-gray-200" />
+          <div className="relative h-8 w-8 overflow-hidden rounded-full">
+            <Image
+              src="/images/YG LOGO.png"
+              alt="User Avatar"
+              fill
+              className="object-contain"
+            />
+          </div>
           <span className="hidden sm:inline-block">John Doe</span>
           <ChevronDown className="h-4 w-4" />
         </Button>
