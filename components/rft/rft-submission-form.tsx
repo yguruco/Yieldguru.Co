@@ -12,6 +12,8 @@ import {
   User,
   ChevronLeft,
   AlertTriangle,
+  XCircle,
+  CheckCircle,
 } from "lucide-react"
 import { motion } from "framer-motion"
 import { z } from "zod"
@@ -30,6 +32,7 @@ import { AddressStep } from "@/components/rft/steps/address-step"
 import { SubmissionReviewStep } from "@/components/rft/steps/submission-review-step"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Progress } from "@/components/ui/progress"
+import { useToast } from "@/hooks/use-toast"
 import type { RFTSubmission, VehicleDetails } from "@/types/rft"
 
 // Define the form schema
@@ -58,6 +61,7 @@ interface RFTSubmissionFormProps {
 
 export function RFTSubmissionForm({ onComplete }: RFTSubmissionFormProps) {
   const router = useRouter()
+  const { toast } = useToast()
   const [currentStep, setCurrentStep] = useState(0)
   const [facialScanData, setFacialScanData] = useState<string | null>(null)
   const [vehicleImages, setVehicleImages] = useState<string[]>([])
@@ -180,11 +184,26 @@ export function RFTSubmissionForm({ onComplete }: RFTSubmissionFormProps) {
     } else {
       // Show error for the current step
       if (currentStep === 1 && !facialScanData) {
-        alert("Please complete the facial scan before proceeding")
+        toast({
+          variant: "destructive",
+          title: "Facial Scan Required",
+          description: "Please complete the facial scan before proceeding.",
+          duration: 5000,
+        })
       } else if (currentStep === 2 && vehicleImages.length === 0) {
-        alert("Please upload at least one vehicle image before proceeding")
+        toast({
+          variant: "destructive",
+          title: "Images Required",
+          description: "Please upload at least one vehicle image before proceeding.",
+          duration: 5000,
+        })
       } else if (currentStep === 3 && !operatorAddress) {
-        alert("Please provide your address information before proceeding")
+        toast({
+          variant: "destructive",
+          title: "Address Required",
+          description: "Please provide your address information before proceeding.",
+          duration: 5000,
+        })
       }
     }
   }
@@ -231,15 +250,18 @@ export function RFTSubmissionForm({ onComplete }: RFTSubmissionFormProps) {
         status: "pending",
       }
 
-      // In a real application, you would send this to your API
-      console.log("Submission data:", JSON.stringify(submission, null, 2))
+      // Send the submission to the API
+      const response = await fetch('/api/submissions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submission),
+      })
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // Store in local storage for demo purposes
-      const existingSubmissions = JSON.parse(localStorage.getItem("rftSubmissions") || "[]")
-      localStorage.setItem("rftSubmissions", JSON.stringify([...existingSubmissions, submission]))
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`)
+      }
 
       // Clear the draft
       localStorage.removeItem("rftDraft")
@@ -250,11 +272,20 @@ export function RFTSubmissionForm({ onComplete }: RFTSubmissionFormProps) {
       onComplete()
 
       // Show success message
-      alert("Your RFT submission has been received and is pending approval.")
+      toast({
+        title: "Submission Successful",
+        description: "Your RFT submission has been received and is pending approval.",
+        duration: 5000,
+      })
     } catch (error) {
       console.error("Error submitting RFT:", error)
       setIsSubmitting(false)
-      alert("There was an error submitting your request. Please try again.")
+      toast({
+        variant: "destructive",
+        title: "Submission Failed",
+        description: "There was an error submitting your request. Please try again.",
+        duration: 5000,
+      })
     }
   }
 
