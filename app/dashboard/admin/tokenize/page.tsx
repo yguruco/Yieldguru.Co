@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useRef } from "react"
 import Image from "next/image"
-import { Shield, Upload, FileText, Check, AlertTriangle, Camera, X } from "lucide-react"
+import { Shield, Upload, FileText, Check, AlertTriangle, Camera, X, Download, ChevronDown } from "lucide-react"
 import { motion, useMotionValue, useTransform } from "framer-motion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -66,6 +66,9 @@ export default function TokenizePage() {
   const rotateX = useTransform(y, [-100, 100], [30, -30])
   const rotateY = useTransform(x, [-100, 100], [-30, 30])
 
+  const [downloadFormat, setDownloadFormat] = useState<string>("text")
+  const [showFormatDropdown, setShowFormatDropdown] = useState(false)
+
   const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect()
     const width = rect.width
@@ -81,6 +84,148 @@ export default function TokenizePage() {
   const handleCardMouseLeave = () => {
     x.set(0)
     y.set(0)
+  }
+
+  const handleDownloadCard = () => {
+    // Create a simplified version of the asset card for download
+    if (!assetName || !assetValue || !assetYield || !assetLocation) {
+      alert('Please fill in the card details before downloading');
+      return;
+    }
+    
+    if (downloadFormat === "text") {
+      // Create simple text version of the card data
+      const cardData = `
+YieldGuru Asset Card
+-------------------
+Asset Name: ${assetName}
+Asset Type: ${assetType}
+Asset Value: $${Number.parseInt(assetValue || '0').toLocaleString()}
+Expected Yield: ${assetYield}%
+Location: ${assetLocation}
+Owner Address: ${ownerAddress || 'Not specified'}
+Description: ${assetDescription || 'No description provided'}
+      `.trim();
+      
+      // Create a data URL for download
+      const dataUrl = 'data:text/plain;charset=utf-8,' + encodeURIComponent(cardData);
+      
+      // Create download link
+      const link = document.createElement('a');
+      link.download = `${assetName.replace(/\s+/g, '-').toLowerCase()}-card.txt`;
+      link.href = dataUrl;
+      link.click();
+    } else if (downloadFormat === "json") {
+      // Create JSON version of the card data
+      const cardData = {
+        assetName,
+        assetType,
+        assetValue: Number.parseInt(assetValue || '0'),
+        assetYield: Number.parseFloat(assetYield || '0'),
+        location: assetLocation,
+        ownerAddress: ownerAddress || 'Not specified',
+        description: assetDescription || 'No description provided',
+        imageUrl: assetImage,
+        tokenizationDate: new Date().toISOString()
+      };
+      
+      // Create a data URL for download
+      const dataUrl = 'data:application/json;charset=utf-8,' + 
+                     encodeURIComponent(JSON.stringify(cardData, null, 2));
+      
+      // Create download link
+      const link = document.createElement('a');
+      link.download = `${assetName.replace(/\s+/g, '-').toLowerCase()}-card.json`;
+      link.href = dataUrl;
+      link.click();
+    } else if (downloadFormat === "pdf") {
+      // Dynamically import jspdf to avoid SSR issues
+      import('jspdf').then(({ default: jsPDF }) => {
+        const doc = new jsPDF();
+        const margin = 20;
+        let yPos = margin;
+        
+        // Add title
+        doc.setFontSize(20);
+        doc.setTextColor(79, 25, 100); // #4f1964
+        doc.text('YieldGuru Asset Card', margin, yPos);
+        yPos += 10;
+        
+        // Add divider
+        doc.setDrawColor(79, 25, 100);
+        doc.setLineWidth(0.5);
+        doc.line(margin, yPos, 190, yPos);
+        yPos += 15;
+        
+        // Add content
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        
+        // Helper function to add a field
+        const addField = (label: string, value: string) => {
+          doc.setFont('helvetica', 'bold');
+          doc.text(`${label}:`, margin, yPos);
+          doc.setFont('helvetica', 'normal');
+          doc.text(value, margin + 50, yPos);
+          yPos += 10;
+        };
+        
+        addField('Asset Name', assetName);
+        addField('Asset Type', assetType);
+        addField('Asset Value', `$${Number.parseInt(assetValue || '0').toLocaleString()}`);
+        addField('Expected Yield', `${assetYield}%`);
+        addField('Location', assetLocation);
+        addField('Owner Address', ownerAddress || 'Not specified');
+        
+        // Description might be longer, so handle it differently
+        yPos += 5;
+        doc.setFont('helvetica', 'bold');
+        doc.text('Description:', margin, yPos);
+        yPos += 7;
+        doc.setFont('helvetica', 'normal');
+        
+        const descLines = doc.splitTextToSize(
+          assetDescription || 'No description provided', 
+          170
+        );
+        doc.text(descLines, margin, yPos);
+        
+        // Save the PDF
+        doc.save(`${assetName.replace(/\s+/g, '-').toLowerCase()}-card.pdf`);
+      }).catch(err => {
+        console.error('Failed to generate PDF:', err);
+        alert('Failed to generate PDF. Please try a different format.');
+      });
+    } else if (downloadFormat === "png" || downloadFormat === "jpeg") {
+      // Dynamically import html-to-image to avoid SSR issues
+      import('html-to-image').then((htmlToImage) => {
+        const cardElement = document.getElementById('assetCard');
+        if (!cardElement) {
+          alert('Card element not found');
+          return;
+        }
+        
+        const method = downloadFormat === 'png' ? htmlToImage.toPng : htmlToImage.toJpeg;
+        
+        method(cardElement, { quality: 0.95 })
+          .then((dataUrl) => {
+            const link = document.createElement('a');
+            link.download = `${assetName.replace(/\s+/g, '-').toLowerCase()}-card.${downloadFormat}`;
+            link.href = dataUrl;
+            link.click();
+          })
+          .catch((err) => {
+            console.error('Failed to generate image:', err);
+            alert('Failed to generate image. Please try a different format.');
+          });
+      }).catch(err => {
+        console.error('Failed to load html-to-image library:', err);
+        alert('Failed to generate image. Please try a different format.');
+      });
+    }
+    
+    // Close dropdown after download
+    setShowFormatDropdown(false);
   }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -522,6 +667,7 @@ export default function TokenizePage() {
                     >
                       <motion.div
                         className="w-full h-[500px] rounded-xl bg-white shadow-xl cursor-pointer relative overflow-hidden"
+                        id="assetCard"
                         style={{
                           rotateX,
                           rotateY,
@@ -591,6 +737,50 @@ export default function TokenizePage() {
                         />
                       </motion.div>
                     </motion.div>
+
+                    {/* Download Options */}
+                    <div className="mt-4 space-y-3">
+                      <div className="relative">
+                        <Button 
+                          onClick={() => setShowFormatDropdown(!showFormatDropdown)}
+                          className="w-full bg-blue-600 hover:bg-blue-700 flex items-center justify-between"
+                        >
+                          <div className="flex items-center">
+                            <Download className="mr-2 h-4 w-4" />
+                            Download as {getFormatLabel(downloadFormat)}
+                          </div>
+                          <ChevronDown className={`h-4 w-4 transition-transform ${showFormatDropdown ? 'rotate-180' : ''}`} />
+                        </Button>
+                        
+                        {/* Format dropdown */}
+                        {showFormatDropdown && (
+                          <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border rounded-md shadow-lg z-10">
+                            <div className="py-1">
+                              <DropdownItem format="text" icon="📄" label="Text File (.txt)" 
+                                current={downloadFormat} onClick={setDownloadFormat} />
+                              <DropdownItem format="json" icon="🔢" label="JSON Data (.json)" 
+                                current={downloadFormat} onClick={setDownloadFormat} />
+                              <DropdownItem format="pdf" icon="📑" label="PDF Document (.pdf)" 
+                                current={downloadFormat} onClick={setDownloadFormat} />
+                              <DropdownItem format="png" icon="🖼️" label="PNG Image (.png)" 
+                                current={downloadFormat} onClick={setDownloadFormat} />
+                              <DropdownItem format="jpeg" icon="📸" label="JPEG Image (.jpeg)" 
+                                current={downloadFormat} onClick={setDownloadFormat} />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {downloadFormat && (
+                        <Button 
+                          onClick={handleDownloadCard}
+                          className="w-full bg-green-600 hover:bg-green-700 flex items-center justify-center"
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          Download {getFormatLabel(downloadFormat)}
+                        </Button>
+                      )}
+                    </div>
 
                     <div className="mt-6">
                       {isTokenizing ? (
@@ -1020,4 +1210,45 @@ export default function TokenizePage() {
       </Card>
     </div>
   )
+}
+
+// Helper components and functions
+function DropdownItem({ 
+  format, 
+  icon, 
+  label, 
+  current, 
+  onClick 
+}: { 
+  format: string; 
+  icon: string; 
+  label: string; 
+  current: string; 
+  onClick: (format: string) => void;
+}) {
+  return (
+    <button
+      className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center ${
+        current === format ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+      }`}
+      onClick={() => onClick(format)}
+    >
+      <span className="mr-2">{icon}</span>
+      {label}
+      {current === format && (
+        <Check className="ml-auto h-4 w-4 text-blue-600" />
+      )}
+    </button>
+  );
+}
+
+function getFormatLabel(format: string): string {
+  switch (format) {
+    case 'text': return 'Text File';
+    case 'json': return 'JSON Data';
+    case 'pdf': return 'PDF Document';
+    case 'png': return 'PNG Image';
+    case 'jpeg': return 'JPEG Image';
+    default: return 'File';
+  }
 }
