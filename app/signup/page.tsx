@@ -6,7 +6,7 @@ import SignupForm from "@/components/signup-form"
 export default function SignupPage() {
   // Define the password requirements
   const passwordRequirements = "Must be at least 8 characters with one special character and one uppercase letter"
-  
+
   // Define the accent color
   const accentColor = "#4f1964" // Purple color
 
@@ -43,7 +43,7 @@ export default function SignupPage() {
           {/* Right column - Image and info */}
           <div className="hidden flex-col justify-center space-y-6 rounded-xl bg-gradient-to-br from-[#4f1964] to-[#7b2e9e] p-8 text-white md:flex">
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-white/20">
-              <Image src="/YG LOGO.png" alt="Yieldguru Logo" width={60} height={60} />
+              <Image src="/images/YG LOGO.png" alt="Yieldguru Logo" width={60} height={60} />
             </div>
             <h2 className="text-2xl font-bold">Welcome to Yieldguru</h2>
             <p>

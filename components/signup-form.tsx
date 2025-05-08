@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { Eye, EyeOff, Info } from "lucide-react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
@@ -42,38 +43,38 @@ export default function SignupForm({ accentColor, passwordRequirements }: Signup
       setError("Name is required")
       return false
     }
-    
+
     if (!email.trim()) {
       setError("Email is required")
       return false
     }
-    
+
     if (!validatePassword(password)) {
       setError(`Password does not meet requirements: ${passwordRequirements}`)
       return false
     }
-    
+
     if (password !== confirmPassword) {
       setError("Passwords do not match")
       return false
     }
-    
+
     return true
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     // Reset error
     setError("")
-    
+
     // Validate form
     if (!validateForm()) {
       return
     }
-    
+
     setIsLoading(true)
-    
+
     try {
       // Call the signup API
       const response = await fetch('/api/auth/signup', {
@@ -88,13 +89,13 @@ export default function SignupForm({ accentColor, passwordRequirements }: Signup
           role
         }),
       })
-      
+
       const data = await response.json()
-      
+
       if (!response.ok) {
         throw new Error(data.error || 'Signup failed')
       }
-      
+
       // Redirect to the appropriate dashboard
       router.push(`/dashboard/${role.toLowerCase()}`)
     } catch (err) {
@@ -106,6 +107,16 @@ export default function SignupForm({ accentColor, passwordRequirements }: Signup
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+      <div className="flex justify-center mb-6">
+        <div className="relative h-12 w-12 overflow-hidden">
+          <Image
+            src="/images/YG LOGO.png"
+            alt="YieldGuru Logo"
+            fill
+            className="object-contain"
+          />
+        </div>
+      </div>
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
           <Alert variant="destructive">
@@ -113,7 +124,7 @@ export default function SignupForm({ accentColor, passwordRequirements }: Signup
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-        
+
         <div className="space-y-2">
           <Label htmlFor="name">Full Name</Label>
           <Input
@@ -126,7 +137,7 @@ export default function SignupForm({ accentColor, passwordRequirements }: Signup
             className="border-gray-300"
           />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -139,7 +150,7 @@ export default function SignupForm({ accentColor, passwordRequirements }: Signup
             className="border-gray-300"
           />
         </div>
-        
+
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Password</Label>
@@ -178,7 +189,7 @@ export default function SignupForm({ accentColor, passwordRequirements }: Signup
             </Button>
           </div>
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="confirmPassword">Confirm Password</Label>
           <div className="relative">
@@ -202,7 +213,7 @@ export default function SignupForm({ accentColor, passwordRequirements }: Signup
             </Button>
           </div>
         </div>
-        
+
         <div className="space-y-2">
           <Label>I am a:</Label>
           <RadioGroup value={role} onValueChange={(value) => setRole(value as "Investor" | "Operator")} className="flex space-x-4">
@@ -216,7 +227,7 @@ export default function SignupForm({ accentColor, passwordRequirements }: Signup
             </div>
           </RadioGroup>
         </div>
-        
+
         <Button
           type="submit"
           className="w-full"

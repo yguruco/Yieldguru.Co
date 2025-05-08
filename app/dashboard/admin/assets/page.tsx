@@ -34,24 +34,49 @@ export default function AdminAssetsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Load assets from localStorage or use default ones
-    const loadAssets = () => {
+    // Load assets from MongoDB API
+    const loadAssets = async () => {
       setLoading(true)
       try {
-        const storedAssets = localStorage.getItem("adminAssets")
-        let assetList: Asset[] = storedAssets ? JSON.parse(storedAssets) : defaultAssets
+        const response = await fetch('/api/assets')
 
-        // Ensure all assets have the required properties
-        assetList = assetList.map((asset) => ({
-          ...asset,
-          tokenization: asset.tokenization || 100,
-          status: asset.status || "Active",
-        }))
+        if (!response.ok) {
+          throw new Error(`Error fetching assets: ${response.status}`)
+        }
 
-        setAssets(assetList)
-        setFilteredAssets(assetList)
+        const data = await response.json()
+
+        // If no assets are found in the database, seed with default assets
+        if (data.length === 0) {
+          console.log('No assets found in database, seeding with default assets')
+
+          // Create default assets in the database
+          for (const asset of defaultAssets) {
+            await fetch('/api/assets', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(asset),
+            })
+          }
+
+          // Fetch again after seeding
+          const secondResponse = await fetch('/api/assets')
+          if (!secondResponse.ok) {
+            throw new Error(`Error fetching assets after seeding: ${secondResponse.status}`)
+          }
+
+          const secondData = await secondResponse.json()
+          setAssets(secondData)
+          setFilteredAssets(secondData)
+        } else {
+          setAssets(data)
+          setFilteredAssets(data)
+        }
       } catch (error) {
         console.error("Error loading assets:", error)
+        // Only use default assets as a fallback if there's an error
         setAssets(defaultAssets)
         setFilteredAssets(defaultAssets)
       } finally {

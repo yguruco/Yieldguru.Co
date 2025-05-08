@@ -50,14 +50,14 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          <ul className="flex space-x-6">
+        <nav className="hidden md:flex items-center justify-center flex-1">
+          <ul className="flex space-x-16 justify-center">
             {["Features", "Solutions", "Pricing", "Blog"].map((item) => (
               <li key={item}>
                 <Link
                   href={`#${item.toLowerCase()}`}
                   className={cn(
-                    "text-sm font-medium transition-colors hover:text-[#fbdc3e]",
+                    "text-sm font-medium transition-colors hover:text-[#fbdc3e] px-2 py-1",
                     isScrolled ? "text-gray-700" : "text-white",
                   )}
                 >
@@ -66,45 +66,10 @@ export default function Navbar() {
               </li>
             ))}
           </ul>
+        </nav>
 
-          <div className="h-5 w-px bg-gray-300/50"></div>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  "flex items-center gap-1 transition-colors px-2",
-                  isScrolled ? "text-gray-700 hover:text-[#4f1964]" : "text-white hover:text-[#fbdc3e]",
-                )}
-              >
-                Dashboards
-                <ChevronDown className="h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem asChild>
-                <Link href="/login/admin" className="flex w-full cursor-pointer items-center">
-                  <Shield className="mr-2 h-4 w-4 text-[#4f1964]" />
-                  <span>Admin</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/login/investor" className="flex w-full cursor-pointer items-center">
-                  <LineChart className="mr-2 h-4 w-4 text-[#fbdc3e]" />
-                  <span>Investor</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/login/operator" className="flex w-full cursor-pointer items-center">
-                  <Truck className="mr-2 h-4 w-4 text-[#f68b27]" />
-                  <span>Operator</span>
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
+        {/* Login Button (Desktop) */}
+        <div className="hidden md:block">
           <Button
             size="sm"
             className={cn(
@@ -120,7 +85,7 @@ export default function Navbar() {
               <span>Login</span>
             </Link>
           </Button>
-        </nav>
+        </div>
 
         {/* Mobile Menu Button */}
         <button className="md:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label="Toggle menu">
@@ -135,13 +100,13 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="absolute left-1/2 right-auto top-[calc(100%+0.75rem)] w-[90%] -translate-x-1/2 rounded-xl bg-white p-4 shadow-lg md:hidden">
-          <nav className="mb-4">
-            <ul className="space-y-3">
+          <nav className="mb-6">
+            <ul className="space-y-5">
               {["Features", "Solutions", "Pricing", "Blog"].map((item) => (
                 <li key={item}>
                   <Link
                     href={`#${item.toLowerCase()}`}
-                    className="block text-sm font-medium text-gray-700 transition-colors hover:text-[#4f1964]"
+                    className="block text-sm font-medium text-gray-700 transition-colors hover:text-[#4f1964] py-2 px-3"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {item}
@@ -151,41 +116,7 @@ export default function Navbar() {
             </ul>
           </nav>
 
-          <div className="mb-4">
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">Dashboards</h3>
-            <ul className="grid grid-cols-3 gap-2">
-              <li>
-                <Link
-                  href="/login/admin"
-                  className="flex flex-col items-center rounded-lg bg-gray-50 p-3 text-center text-sm text-gray-700 transition-colors hover:bg-gray-100 hover:text-[#4f1964]"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <Shield className="mb-1 h-5 w-5 text-[#4f1964]" />
-                  <span className="text-xs">Admin</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/login/investor"
-                  className="flex flex-col items-center rounded-lg bg-gray-50 p-3 text-center text-sm text-gray-700 transition-colors hover:bg-gray-100 hover:text-[#4f1964]"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <LineChart className="mb-1 h-5 w-5 text-[#fbdc3e]" />
-                  <span className="text-xs">Investor</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/login/operator"
-                  className="flex flex-col items-center rounded-lg bg-gray-50 p-3 text-center text-sm text-gray-700 transition-colors hover:bg-gray-100 hover:text-[#4f1964]"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <Truck className="mb-1 h-5 w-5 text-[#f68b27]" />
-                  <span className="text-xs">Operator</span>
-                </Link>
-              </li>
-            </ul>
-          </div>
+
 
           <Button
             className="mt-2 w-full bg-[#4f1964] text-white hover:bg-[#4f1964]/90"

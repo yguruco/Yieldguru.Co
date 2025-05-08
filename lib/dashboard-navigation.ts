@@ -1,4 +1,4 @@
-import { BarChart, BookOpen, Car, Home, LineChart, Shield, Truck, Users, Wallet, Droplets } from "lucide-react"
+import { BarChart, BookOpen, Car, Home, LineChart, Shield, Truck, Users, Wallet, Droplets, UserCircle } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 interface NavItem {
@@ -8,7 +8,10 @@ interface NavItem {
 }
 
 export function getNavItems(dashboardType: string): NavItem[] {
-  const baseItems = [{ name: "Overview", href: "", icon: Home }]
+  const baseItems = [
+    { name: "Overview", href: "", icon: Home },
+    { name: "Profile", href: "/profile", icon: UserCircle }
+  ]
 
   const adminItems = [
     { name: "Users", href: "/users", icon: Users },
@@ -16,7 +19,7 @@ export function getNavItems(dashboardType: string): NavItem[] {
     { name: "RFT Approvals", href: "/rft-approvals", icon: BookOpen },
     { name: "Tokenize", href: "/tokenize", icon: Shield },
     { name: "Liquidity Pool", href: "/liquidity-pool", icon: Droplets },
-    
+
   ]
 
   const investorItems = [
