@@ -113,8 +113,12 @@ export default function Navbar() {
                 ? "bg-[#4f1964] text-white hover:bg-[#4f1964]/90"
                 : "bg-white text-[#4f1964] hover:bg-white/90",
             )}
+            asChild
           >
-            Login
+            <Link href="/login" className="flex items-center gap-1">
+              <LogIn className="h-4 w-4" />
+              <span>Login</span>
+            </Link>
           </Button>
         </nav>
 
@@ -186,8 +190,12 @@ export default function Navbar() {
           <Button
             className="mt-2 w-full bg-[#4f1964] text-white hover:bg-[#4f1964]/90"
             onClick={() => setIsMobileMenuOpen(false)}
+            asChild
           >
-            Login
+            <Link href="/login" className="flex items-center justify-center gap-1">
+              <LogIn className="h-4 w-4" />
+              <span>Login</span>
+            </Link>
           </Button>
         </div>
       )}

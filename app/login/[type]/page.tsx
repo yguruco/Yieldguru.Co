@@ -4,7 +4,7 @@ import Image from "next/image"
 import { ArrowLeft } from "lucide-react"
 import LoginForm from "@/components/login-form"
 
-export default function LoginPage({ params }: { params: { type: string } }) {
+export default async function LoginPage({ params }: { params: { type: string } }) {
   const { type } = params
 
   // Validate dashboard type
@@ -68,6 +68,15 @@ export default function LoginPage({ params }: { params: { type: string } }) {
           accentColor={dashboardInfo.color}
           passwordRequirements={dashboardInfo.passwordRequirements}
         />
+
+        {type !== "admin" && (
+          <div className="mt-6 text-center text-sm text-gray-600">
+            Don&apos;t have an account?{" "}
+            <Link href="/signup" className="font-medium hover:underline" style={{ color: dashboardInfo.color }}>
+              Sign up
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    button {
+      background-color: #4f1964;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test Login API</h1>
+  
+  <div class="card">
+    <h2>Admin Login</h2>
+    <button onclick="testAdminLogin()">Test Admin Login</button>
+    <pre id="adminResult">Results will appear here...</pre>
+  </div>
+  
+  <div class="card">
+    <h2>Investor Login</h2>
+    <button onclick="testInvestorLogin()">Test Investor Login</button>
+    <pre id="investorResult">Results will appear here...</pre>
+  </div>
+  
+  <div class="card">
+    <h2>Operator Login</h2>
+    <button onclick="testOperatorLogin()">Test Operator Login</button>
+    <pre id="operatorResult">Results will appear here...</pre>
+  </div>
+  
+  <div class="card">
+    <h2>Check Authentication</h2>
+    <button onclick="checkAuth()">Check Auth Status</button>
+    <pre id="authResult">Results will appear here...</pre>
+  </div>
+  
+  <script>
+    async function testAdminLogin() {
+      const resultElement = document.getElementById('adminResult');
+      resultElement.textContent = 'Testing admin login...';
+      
+      try {
+        const response = await fetch('/api/auth/admin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: 'admin@yieldguru.co',
+            password: 'Admin@123',
+          }),
+        });
+        
+        const data = await response.json();
+        resultElement.textContent = `Status: ${response.status}\n${JSON.stringify(data, null, 2)}`;
+      } catch (error) {
+        resultElement.textContent = `Error: ${error.message}`;
+      }
+    }
+    
+    async function testInvestorLogin() {
+      const resultElement = document.getElementById('investorResult');
+      resultElement.textContent = 'Testing investor login...';
+      
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: 'investor@test.com',
+            password: 'Investor123!',
+          }),
+        });
+        
+        const data = await response.json();
+        resultElement.textContent = `Status: ${response.status}\n${JSON.stringify(data, null, 2)}`;
+      } catch (error) {
+        resultElement.textContent = `Error: ${error.message}`;
+      }
+    }
+    
+    async function testOperatorLogin() {
+      const resultElement = document.getElementById('operatorResult');
+      resultElement.textContent = 'Testing operator login...';
+      
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: 'operator@test.com',
+            password: 'Operator123!',
+          }),
+        });
+        
+        const data = await response.json();
+        resultElement.textContent = `Status: ${response.status}\n${JSON.stringify(data, null, 2)}`;
+      } catch (error) {
+        resultElement.textContent = `Error: ${error.message}`;
+      }
+    }
+    
+    async function checkAuth() {
+      const resultElement = document.getElementById('authResult');
+      resultElement.textContent = 'Checking authentication status...';
+      
+      try {
+        const response = await fetch('/api/auth/me');
+        const data = await response.json();
+        resultElement.textContent = `Status: ${response.status}\n${JSON.stringify(data, null, 2)}`;
+      } catch (error) {
+        resultElement.textContent = `Error: ${error.message}`;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -10,100 +10,93 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-interface LoginFormProps {
-  dashboardType: string
+interface SignupFormProps {
   accentColor: string
   passwordRequirements: string
 }
 
-export default function LoginForm({ dashboardType, accentColor, passwordRequirements }: LoginFormProps) {
+export default function SignupForm({ accentColor, passwordRequirements }: SignupFormProps) {
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [role, setRole] = useState<"Investor" | "Operator">("Investor")
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
 
+  // Password validation function
   const validatePassword = (password: string): boolean => {
-    // For generalized login, use a basic validation
-    if (dashboardType === "general") {
-      // Basic validation: at least 8 characters
-      return password.length >= 8
-    }
-    // Different validation based on dashboard type
-    else if (dashboardType === "admin") {
-      // Admin: uppercase, number, special char
-      return /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/.test(password)
-    } else if (dashboardType === "investor") {
-      // Investor: 10+ chars, lowercase, number
-      return password.length >= 10 && /[a-z]/.test(password) && /[0-9]/.test(password)
-    } else {
-      // Operator: 8+ chars, special char, uppercase
-      return password.length >= 8 && /[!@#$%^&*]/.test(password) && /[A-Z]/.test(password)
-    }
+    // Basic validation - can be enhanced based on requirements
+    return password.length >= 8
   }
 
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    // Reset error
-    setError("")
-
+  // Form validation
+  const validateForm = (): boolean => {
+    if (!name.trim()) {
+      setError("Name is required")
+      return false
+    }
+    
+    if (!email.trim()) {
+      setError("Email is required")
+      return false
+    }
+    
     if (!validatePassword(password)) {
       setError(`Password does not meet requirements: ${passwordRequirements}`)
+      return false
+    }
+    
+    if (password !== confirmPassword) {
+      setError("Passwords do not match")
+      return false
+    }
+    
+    return true
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    // Reset error
+    setError("")
+    
+    // Validate form
+    if (!validateForm()) {
       return
     }
-
+    
     setIsLoading(true)
-
+    
     try {
-      let endpoint = '/api/auth/login';
-
-      // For admin login, use the admin endpoint
-      if (dashboardType === "admin") {
-        endpoint = '/api/auth/admin';
-      }
-
-      // For generalized login, try the regular login endpoint first
-      // The server will determine the user's role
-
-      // Call the login API
-      const response = await fetch(endpoint, {
+      // Call the signup API
+      const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          name,
           email,
           password,
+          role
         }),
       })
-
+      
       const data = await response.json()
-
+      
       if (!response.ok) {
-        throw new Error(data.error || 'Login failed')
+        throw new Error(data.error || 'Signup failed')
       }
-
-      // Determine the dashboard type from the user's role
-      let redirectDashboard = dashboardType;
-
-      if (dashboardType === "general" && data.user && data.user.role) {
-        // Map the role to the dashboard type
-        const roleMap: Record<string, string> = {
-          'Admin': 'admin',
-          'Investor': 'investor',
-          'Operator': 'operator'
-        };
-
-        redirectDashboard = roleMap[data.user.role] || 'investor';
-      }
-
+      
       // Redirect to the appropriate dashboard
-      router.push(`/dashboard/${redirectDashboard}`)
+      router.push(`/dashboard/${role.toLowerCase()}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred')
     } finally {
@@ -120,6 +113,20 @@ export default function LoginForm({ dashboardType, accentColor, passwordRequirem
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
+        
+        <div className="space-y-2">
+          <Label htmlFor="name">Full Name</Label>
+          <Input
+            id="name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="John Doe"
+            required
+            className="border-gray-300"
+          />
+        </div>
+        
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -132,14 +139,14 @@ export default function LoginForm({ dashboardType, accentColor, passwordRequirem
             className="border-gray-300"
           />
         </div>
-
+        
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Password</Label>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" type="button" className="h-5 w-5 text-gray-400">
+                  <Button variant="ghost" size="icon" className="h-5 w-5 text-gray-400">
                     <Info className="h-4 w-4" />
                     <span className="sr-only">Password requirements</span>
                   </Button>
@@ -150,16 +157,14 @@ export default function LoginForm({ dashboardType, accentColor, passwordRequirem
               </Tooltip>
             </TooltipProvider>
           </div>
-
           <div className="relative">
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
               required
-              className="border-gray-300 pr-10"
+              className="pr-10 border-gray-300"
             />
             <Button
               type="button"
@@ -173,14 +178,52 @@ export default function LoginForm({ dashboardType, accentColor, passwordRequirem
             </Button>
           </div>
         </div>
-
+        
+        <div className="space-y-2">
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <div className="relative">
+            <Input
+              id="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className="pr-10 border-gray-300"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="absolute right-0 top-0 h-full px-3 text-gray-400"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              <span className="sr-only">{showConfirmPassword ? "Hide password" : "Show password"}</span>
+            </Button>
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label>I am a:</Label>
+          <RadioGroup value={role} onValueChange={(value) => setRole(value as "Investor" | "Operator")} className="flex space-x-4">
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="Investor" id="investor" />
+              <Label htmlFor="investor" className="cursor-pointer">Investor</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="Operator" id="operator" />
+              <Label htmlFor="operator" className="cursor-pointer">EV Operator</Label>
+            </div>
+          </RadioGroup>
+        </div>
+        
         <Button
           type="submit"
-          className="w-full text-white transition-all hover:opacity-90"
-          style={{ backgroundColor: accentColor }}
+          className="w-full"
+          style={{ backgroundColor: accentColor, color: accentColor === "#fbdc3e" ? "black" : "white" }}
           disabled={isLoading}
         >
-          {isLoading ? "Signing in..." : "Sign in"}
+          {isLoading ? "Creating Account..." : "Create Account"}
         </Button>
       </form>
     </motion.div>
