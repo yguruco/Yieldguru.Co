@@ -35,13 +35,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/auth/me')
+        console.log('Checking authentication status...')
+        console.log('Current cookies:', document.cookie)
+
+        const response = await fetch('/api/auth/me', {
+          credentials: 'include' // Make sure cookies are sent with the request
+        })
+
+        console.log('Auth check response status:', response.status)
+
         if (response.ok) {
           const data = await response.json()
+          console.log('Auth check successful:', data)
           setUser(data.user)
+        } else {
+          // Handle non-OK responses
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+          console.error('Auth check failed:', response.status, errorData)
+          setUser(null)
         }
       } catch (error) {
         console.error('Auth check error:', error)
+        setUser(null)
       } finally {
         setLoading(false)
       }
@@ -55,29 +70,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true)
     try {
       const endpoint = isAdmin ? '/api/auth/admin' : '/api/auth/login'
+      console.log('Login attempt:', { email, isAdmin, endpoint })
+
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
+        credentials: 'include' // Make sure cookies are included
       })
+
+      console.log('Login response status:', response.status)
+      console.log('Response headers:', [...response.headers.entries()])
+
+      const data = await response.json()
+      console.log('Login response data:', data)
 
       if (!response.ok) {
         const error = await response.json()
         throw new Error(error.error || 'Login failed')
       }
 
-      const data = await response.json()
+      console.log('Cookies after login:', document.cookie)
       setUser(data.user)
 
       // Redirect based on user role
-      const dashboardType = data.user.role === 'Admin' 
-        ? 'admin' 
-        : data.user.role === 'Investor' 
-          ? 'investor' 
+      const dashboardType = data.user.role === 'Admin'
+        ? 'admin'
+        : data.user.role === 'Investor'
+          ? 'investor'
           : 'operator'
-      
+
       router.push(`/dashboard/${dashboardType}`)
     } catch (error) {
       console.error('Login error:', error)

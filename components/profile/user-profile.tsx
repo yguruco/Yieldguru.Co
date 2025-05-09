@@ -17,7 +17,7 @@ interface UserProfileProps {
 }
 
 export default function UserProfile({ accentColor }: UserProfileProps) {
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -25,11 +25,17 @@ export default function UserProfile({ accentColor }: UserProfileProps) {
   })
   const [loading, setLoading] = useState(false)
 
+  // Debug user data
+  useEffect(() => {
+    console.log("Auth state:", { user, authLoading })
+  }, [user, authLoading])
+
   useEffect(() => {
     if (user) {
+      console.log("Setting form data with user:", user)
       setFormData({
-        name: user.name,
-        email: user.email
+        name: user.name || "",
+        email: user.email || ""
       })
     }
   }, [user])
@@ -45,19 +51,19 @@ export default function UserProfile({ accentColor }: UserProfileProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    
+
     try {
       // In a real implementation, you would update the user profile here
       // For now, we'll just simulate a delay
       await new Promise(resolve => setTimeout(resolve, 1000))
-      
+
       // Update would happen here
       // const response = await fetch('/api/user/profile', {
       //   method: 'PATCH',
       //   headers: { 'Content-Type': 'application/json' },
       //   body: JSON.stringify(formData)
       // })
-      
+
       setIsEditing(false)
     } catch (error) {
       console.error("Error updating profile:", error)
@@ -66,28 +72,43 @@ export default function UserProfile({ accentColor }: UserProfileProps) {
     }
   }
 
-  const formatDate = (dateString: string | Date) => {
+  const formatDate = (dateString?: string | Date) => {
     if (!dateString) return "N/A"
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
+    try {
+      const date = new Date(dateString)
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    } catch (error) {
+      console.error("Error formatting date:", error)
+      return "Invalid Date"
+    }
+  }
+
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: accentColor }}></div>
+        <span className="ml-3 text-gray-600">Loading user data...</span>
+      </div>
+    )
   }
 
   if (!user) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: accentColor }}></div>
+      <div className="flex flex-col justify-center items-center h-64 space-y-4">
+        <div className="text-red-500 text-xl">User data not available</div>
+        <p className="text-gray-600">There was a problem loading your profile. Please try refreshing the page.</p>
       </div>
     )
   }
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -99,7 +120,7 @@ export default function UserProfile({ accentColor }: UserProfileProps) {
           <p className="text-muted-foreground">Manage your account information and settings</p>
         </div>
         {!isEditing ? (
-          <Button 
+          <Button
             onClick={() => setIsEditing(true)}
             style={{ backgroundColor: accentColor }}
             className="text-white hover:opacity-90"
@@ -109,14 +130,14 @@ export default function UserProfile({ accentColor }: UserProfileProps) {
           </Button>
         ) : (
           <div className="flex gap-2">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setIsEditing(false)}
             >
               <X className="mr-2 h-4 w-4" />
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleSubmit}
               style={{ backgroundColor: accentColor }}
               className="text-white hover:opacity-90"
@@ -160,7 +181,7 @@ export default function UserProfile({ accentColor }: UserProfileProps) {
                     />
                   </div>
                   <Badge style={{ backgroundColor: accentColor }} className="text-white">
-                    {user.role}
+                    {user?.role || "User"}
                   </Badge>
                 </div>
 
@@ -194,28 +215,28 @@ export default function UserProfile({ accentColor }: UserProfileProps) {
                           <User className="mr-2 h-4 w-4" />
                           Full Name
                         </div>
-                        <div className="font-medium">{user.name}</div>
+                        <div className="font-medium">{user?.name || "N/A"}</div>
                       </div>
                       <div className="grid gap-1">
                         <div className="flex items-center text-sm text-muted-foreground">
                           <Mail className="mr-2 h-4 w-4" />
                           Email
                         </div>
-                        <div className="font-medium">{user.email}</div>
+                        <div className="font-medium">{user?.email || "N/A"}</div>
                       </div>
                       <div className="grid gap-1">
                         <div className="flex items-center text-sm text-muted-foreground">
                           <Shield className="mr-2 h-4 w-4" />
                           Role
                         </div>
-                        <div className="font-medium">{user.role}</div>
+                        <div className="font-medium">{user?.role || "N/A"}</div>
                       </div>
                       <div className="grid gap-1">
                         <div className="flex items-center text-sm text-muted-foreground">
                           <Clock className="mr-2 h-4 w-4" />
                           Last Login
                         </div>
-                        <div className="font-medium">{formatDate(user.lastLogin)}</div>
+                        <div className="font-medium">{user?.lastLogin ? formatDate(user.lastLogin) : "N/A"}</div>
                       </div>
                       <div className="grid gap-1">
                         <div className="flex items-center text-sm text-muted-foreground">
@@ -223,8 +244,8 @@ export default function UserProfile({ accentColor }: UserProfileProps) {
                           Account Status
                         </div>
                         <div className="font-medium">
-                          <Badge variant={user.status === "Active" ? "success" : "secondary"}>
-                            {user.status}
+                          <Badge variant={user?.status === "Active" ? "success" : "secondary"}>
+                            {user?.status || "Unknown"}
                           </Badge>
                         </div>
                       </div>

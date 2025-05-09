@@ -34,7 +34,7 @@ export default function SignupPage() {
 
             <div className="text-center text-sm text-gray-600">
               Already have an account?{" "}
-              <Link href="/login/investor" className="font-medium text-[#4f1964] hover:underline">
+              <Link href="/login" className="font-medium text-[#4f1964] hover:underline">
                 Sign in
               </Link>
             </div>

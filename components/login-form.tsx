@@ -84,9 +84,14 @@ export default function LoginForm({ dashboardType, accentColor, passwordRequirem
 
       const data = await response.json()
 
+      console.log('Login response:', response.status, data)
+
       if (!response.ok) {
         throw new Error(data.error || 'Login failed')
       }
+
+      // Check if auth_token cookie was set
+      console.log('Cookies after login:', document.cookie)
 
       // Determine the dashboard type from the user's role
       let redirectDashboard = dashboardType;

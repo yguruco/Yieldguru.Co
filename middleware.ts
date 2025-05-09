@@ -8,9 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'yieldguru-secret-key';
 // Paths that don't require authentication
 const publicPaths = [
   '/',
-  '/login/admin',
-  '/login/investor',
-  '/login/operator',
+  '/login',
   '/signup',
   '/api/auth/login',
   '/api/auth/signup',
@@ -19,10 +17,10 @@ const publicPaths = [
 
 // Check if the path is public
 const isPublicPath = (path: string) => {
-  return publicPaths.some(publicPath => 
-    path === publicPath || 
-    path.startsWith('/api/auth/') || 
-    path.startsWith('/_next/') || 
+  return publicPaths.some(publicPath =>
+    path === publicPath ||
+    path.startsWith('/api/auth/') ||
+    path.startsWith('/_next/') ||
     path.startsWith('/images/') ||
     path.startsWith('/fonts/') ||
     path.includes('.') // Static files
@@ -31,52 +29,62 @@ const isPublicPath = (path: string) => {
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  
+  console.log('Middleware: Processing path:', path);
+
   // Allow public paths
   if (isPublicPath(path)) {
+    console.log('Middleware: Public path, allowing access');
     return NextResponse.next();
   }
-  
+
   // Check for auth token
   const token = request.cookies.get('auth_token')?.value;
-  
+  console.log('Middleware: Auth token present:', !!token);
+
   // If no token, redirect to login
   if (!token) {
-    return NextResponse.redirect(new URL('/login/investor', request.url));
+    console.log('Middleware: No auth token, redirecting to login');
+    return NextResponse.redirect(new URL('/login', request.url));
   }
-  
+
   try {
     // Verify the token
+    console.log('Middleware: Verifying token with JWT_SECRET:', JWT_SECRET.substring(0, 5) + '...');
     const { payload } = await jwtVerify(
       token,
       new TextEncoder().encode(JWT_SECRET)
     );
-    
+
+    console.log('Middleware: Token verified, payload:', payload);
+
     // Check if user is trying to access the correct dashboard
     if (path.startsWith('/dashboard/')) {
       const dashboardType = path.split('/')[2]; // Extract dashboard type from URL
       const userRole = payload.role as string;
-      
+      console.log('Middleware: Dashboard access check - User role:', userRole, 'Dashboard:', dashboardType);
+
       // Map role to dashboard type
       const roleMap: Record<string, string> = {
         'Admin': 'admin',
         'Investor': 'investor',
         'Operator': 'operator'
       };
-      
+
       // If user is trying to access a dashboard they don't have access to
       if (dashboardType !== roleMap[userRole]) {
+        console.log('Middleware: Redirecting to correct dashboard:', roleMap[userRole]);
         // Redirect to their correct dashboard
         return NextResponse.redirect(new URL(`/dashboard/${roleMap[userRole]}`, request.url));
       }
     }
-    
+
     // Token is valid, proceed
+    console.log('Middleware: Authentication successful, proceeding');
     return NextResponse.next();
   } catch (error) {
     // Token is invalid, redirect to login
-    console.error('Auth error:', error);
-    return NextResponse.redirect(new URL('/login/investor', request.url));
+    console.error('Middleware: Auth error:', error);
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 }
 

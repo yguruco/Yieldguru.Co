@@ -62,15 +62,16 @@ export async function POST(request: NextRequest) {
     );
 
     // Set cookie
+    console.log('Setting auth_token cookie with signup token:', token);
     const cookieStore = await cookies();
     cookieStore.set({
       name: 'auth_token',
       value: token,
       httpOnly: true,
       path: '/',
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // Set to false for local development
       maxAge: 60 * 60 * 24, // 24 hours
-      sameSite: 'strict'
+      sameSite: 'lax' // Changed from 'strict' to 'lax' for better compatibility
     });
 
     // Return user data (excluding password)
