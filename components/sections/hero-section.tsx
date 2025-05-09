@@ -20,7 +20,7 @@ export default function HeroSection() {
     <section ref={sectionRef} className="relative flex min-h-screen items-center justify-center">
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/ford.jpeg"
+          src="/images/electric-bus.jpeg"
           alt="Electric vehicle on the road"
           fill
           className="object-cover object-center brightness-[0.7]"
@@ -67,7 +67,7 @@ export default function HeroSection() {
           <Button size="lg" className="bg-yellow-300 text-purple-900 hover:bg-yellow-300/90">
             Get Started <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
-          <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+          <Button size="lg" variant="outline" className="border-white text-black hover:bg-white/10">
             Learn More
           </Button>
         </motion.div>
