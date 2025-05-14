@@ -138,14 +138,14 @@ export default function MarketplacePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Marketplace</h1>
-          <p className="text-muted-foreground">Browse and invest in tokenized EV assets</p>
+          <p className="text-muted-foreground">Browse and invest in tokenized EV loans</p>
         </div>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>Available Assets</CardTitle>
-          <CardDescription>Browse tokenized EV assets available for investment</CardDescription>
+          <CardDescription>Browse tokenized EV loans available for investment</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-6 space-y-4">

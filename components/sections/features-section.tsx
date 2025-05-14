@@ -8,7 +8,7 @@ export default function FeaturesSection() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mx-auto mb-16 max-w-3xl text-center">
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Why Choose YieldGuru for EV Asset Tokenization
+            Why Choose YieldGuru for EV Loan Investments
           </h2>
           <p className="text-lg text-gray-600">
             Our platform combines cutting-edge blockchain technology with deep EV industry expertise.
@@ -73,7 +73,7 @@ const features = [
   },
   {
     title: "Liquidity Options",
-    description: "Secondary market access for trading tokenized assets with ease.",
+    description: "Secondary market access for trading tokenized EV loans with ease.",
     icon: LineChart,
   },
 ]

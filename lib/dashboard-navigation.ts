@@ -14,6 +14,7 @@ export function getNavItems(dashboardType: string): NavItem[] {
     { name: "Assets", href: "/assets", icon: Wallet },
     { name: "RFT Approvals", href: "/rft-approvals", icon: BookOpen },
     { name: "Tokenize", href: "/tokenize", icon: Shield },
+    { name: "Create Loan", href: "/create-loan", icon: Wallet },
   ]
 
   const investorItems = [

@@ -353,15 +353,15 @@ Admin Address: ${adminAddress}
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Tokenize Assets</h1>
-          <p className="text-muted-foreground">Create new tokenized assets on the platform</p>
+          <h1 className="text-3xl font-bold tracking-tight">Tokenize EV Loans</h1>
+          <p className="text-muted-foreground">Create new tokenized EV loans on the platform</p>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Manual Asset Tokenization</CardTitle>
-          <CardDescription>Enter the details of the asset you want to tokenize</CardDescription>
+          <CardTitle>Manual EV Loan Tokenization</CardTitle>
+          <CardDescription>Enter the details of the EV loan you want to tokenize</CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
@@ -397,7 +397,7 @@ Admin Address: ${adminAddress}
 
               <div className="flex gap-4">
                 <Button onClick={resetForm} className="flex-1 bg-[#4f1964] hover:bg-[#4f1964]/90">
-                  Tokenize Another Asset
+                  Tokenize Another EV Loan
                 </Button>
                 <Button
                   onClick={() => {
@@ -634,9 +634,8 @@ Admin Address: ${adminAddress}
                       disabled={isTokenizing}
                     >
                       <Shield className="mr-2 h-4 w-4" />
-                      Tokenize Asset
+                      Tokenize EV Loan
                     </Button>
-                    
                   )}
                   <WalletComponents />
                   <MintNFT />

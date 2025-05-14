@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Plus, Search, Filter } from "lucide-react"
+import { Plus, Search, Filter, CreditCard } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -13,77 +13,72 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { motion } from "framer-motion"
 
-interface Asset {
+interface Loan {
   id: string
   name: string
   image: string
-  type: string
   operator: string
-  value: number
-  tokenization: number
+  borrower: string
+  adminAddress: string
+  amount: number
+  repaymentAmount: number
+  duration: number
+  monthlyInterest?: number
+  createdAt: string
   status: string
-  tokenizationHash?: string
-  tokenizationDate?: string
+  transactionHash?: string
 }
 
-export default function AdminAssetsPage() {
+export default function AdminLoansPage() {
   const router = useRouter()
-  const [assets, setAssets] = useState<Asset[]>([])
-  const [filteredAssets, setFilteredAssets] = useState<Asset[]>([])
+  const [loans, setLoans] = useState<Loan[]>([])
+  const [filteredLoans, setFilteredLoans] = useState<Loan[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Load assets from localStorage or use default ones
-    const loadAssets = () => {
+    // Load loans from localStorage or use default ones
+    const loadLoans = () => {
       setLoading(true)
       try {
-        const storedAssets = localStorage.getItem("adminAssets")
-        let assetList: Asset[] = storedAssets ? JSON.parse(storedAssets) : defaultAssets
+        const storedLoans = localStorage.getItem("adminLoans")
+        let loanList: Loan[] = storedLoans ? JSON.parse(storedLoans) : defaultLoans
 
-        // Ensure all assets have the required properties
-        assetList = assetList.map((asset) => ({
-          ...asset,
-          tokenization: asset.tokenization || 100,
-          status: asset.status || "Active",
-        }))
-
-        setAssets(assetList)
-        setFilteredAssets(assetList)
+        setLoans(loanList)
+        setFilteredLoans(loanList)
       } catch (error) {
-        console.error("Error loading assets:", error)
-        setAssets(defaultAssets)
-        setFilteredAssets(defaultAssets)
+        console.error("Error loading loans:", error)
+        setLoans(defaultLoans)
+        setFilteredLoans(defaultLoans)
       } finally {
         setLoading(false)
       }
     }
 
-    loadAssets()
+    loadLoans()
   }, [])
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
-      setFilteredAssets(assets)
+      setFilteredLoans(loans)
     } else {
       const query = searchQuery.toLowerCase()
-      const filtered = assets.filter(
-        (asset) =>
-          asset.name.toLowerCase().includes(query) ||
-          asset.operator.toLowerCase().includes(query) ||
-          asset.type.toLowerCase().includes(query) ||
-          asset.id.toLowerCase().includes(query),
+      const filtered = loans.filter(
+        (loan) =>
+          loan.name.toLowerCase().includes(query) ||
+          loan.operator.toLowerCase().includes(query) ||
+          loan.id.toLowerCase().includes(query)
       )
-      setFilteredAssets(filtered)
+      setFilteredLoans(filtered)
     }
-  }, [searchQuery, assets])
+  }, [searchQuery, loans])
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
   }
 
   const handleCreateNew = () => {
-    router.push("/dashboard/admin/tokenize")
+    router.push("/dashboard/admin/create-loan")
   }
 
   if (loading) {
@@ -94,28 +89,32 @@ export default function AdminAssetsPage() {
     )
   }
 
+  const totalRepayment = loans.reduce((sum, loan) => sum + loan.repaymentAmount, 0)
+  const totalLent = loans.reduce((sum, loan) => sum + loan.amount, 0)
+  const avgInterestRate = totalLent > 0 ? ((totalRepayment / totalLent - 1) * 100) : 0
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Asset Management</h1>
-          <p className="text-muted-foreground">Manage tokenized EV assets on the platform</p>
+          <h1 className="text-3xl font-bold tracking-tight">EV Loans</h1>
+          <p className="text-muted-foreground">Manage tokenized EV loans on the platform</p>
         </div>
         <Button className="bg-[#4f1964] hover:bg-[#4f1964]/90" onClick={handleCreateNew}>
           <Plus className="mr-2 h-4 w-4" />
-          Add New Asset
+          Create New Loan
         </Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Loans</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,245</div>
+            <div className="text-2xl font-bold">{loans.length}</div>
             <p className="text-xs text-muted-foreground">
-              {assets.filter((a) => a.status === "Active").length} active assets
+              {loans.filter((a) => a.status === "Active").length} active loans
             </p>
           </CardContent>
         </Card>
@@ -124,60 +123,58 @@ export default function AdminAssetsPage() {
             <CardTitle className="text-sm font-medium">Total Value</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$24.5M</div>
-            <p className="text-xs text-muted-foreground">All tokenized assets</p>
+            <div className="text-2xl font-bold">${totalLent.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">All tokenized EV loans</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tokenization Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">Expected Returns</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {Math.round(assets.reduce((sum, asset) => sum + asset.tokenization, 0) / (assets.length || 1))}%
-            </div>
-            <p className="text-xs text-muted-foreground">Average across all assets</p>
+            <div className="text-2xl font-bold">${totalRepayment.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">Total repayment amount</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Yield</CardTitle>
+            <CardTitle className="text-sm font-medium">Average Interest</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5.2%</div>
-            <p className="text-xs text-muted-foreground">+0.3% from last month</p>
+            <div className="text-2xl font-bold">{avgInterestRate.toFixed(1)}%</div>
+            <p className="text-xs text-muted-foreground">Across all active loans</p>
           </CardContent>
         </Card>
       </div>
 
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-        <Input placeholder="Search assets..." className="pl-10" value={searchQuery} onChange={handleSearchChange} />
+        <Input placeholder="Search loans..." className="pl-10" value={searchQuery} onChange={handleSearchChange} />
       </div>
 
-      {filteredAssets.length === 0 ? (
+      {filteredLoans.length === 0 ? (
         <div className="text-center py-12">
           <div className="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-            <Filter className="h-8 w-8 text-gray-400" />
+            <CreditCard className="h-8 w-8 text-gray-400" />
           </div>
-          <h3 className="text-lg font-medium">No assets found</h3>
+          <h3 className="text-lg font-medium">No loans found</h3>
           <p className="text-gray-500 mt-2">
-            {assets.length === 0
-              ? "You don't have any assets yet. Create a new asset to get started."
-              : "No assets match your search criteria. Try a different search term."}
+            {loans.length === 0
+              ? "You don't have any loans yet. Create a new loan to get started."
+              : "No loans match your search criteria. Try a different search term."}
           </p>
-          {assets.length === 0 && (
+          {loans.length === 0 && (
             <Button onClick={handleCreateNew} className="mt-4 bg-[#4f1964] hover:bg-[#4f1964]/90">
               <Plus className="mr-2 h-4 w-4" />
-              Add New Asset
+              Create New Loan
             </Button>
           )}
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredAssets.map((asset, index) => (
+          {filteredLoans.map((loan, index) => (
             <motion.div
-              key={asset.id}
+              key={loan.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -185,62 +182,78 @@ export default function AdminAssetsPage() {
               <Card className="overflow-hidden h-full flex flex-col">
                 <div className="relative h-48">
                   <Image
-                    src={asset.image || "/placeholder.svg?height=200&width=300"}
-                    alt={asset.name}
+                    src={loan.image || "/placeholder.svg?height=200&width=300"}
+                    alt={loan.name}
                     fill
                     className="object-cover"
                   />
                   <div className="absolute top-2 right-2">
-                    <Badge className="bg-[#4f1964]">{asset.type}</Badge>
+                    <Badge className="bg-[#4f1964]">EV Loan</Badge>
                   </div>
                 </div>
                 <CardHeader>
-                  <CardTitle>{asset.name}</CardTitle>
-                  <CardDescription>Operated by {asset.operator}</CardDescription>
+                  <CardTitle>{loan.name}</CardTitle>
+                  <CardDescription>Operator: {loan.operator}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1">
                   <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span className="font-medium">Value:</span>
-                      <span>${asset.value.toLocaleString()}</span>
-                    </div>
-
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Tokenization:</span>
-                        <span>{asset.tokenization}%</span>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-600">Loan Amount</p>
+                        <p className="text-xl font-bold">${loan.amount.toLocaleString()}</p>
                       </div>
-                      <Progress value={asset.tokenization} className="h-2" />
+                      <div>
+                        <p className="text-sm font-semibold text-gray-600">Repayment</p>
+                        <p className="text-xl font-bold">${loan.repaymentAmount.toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-600">Interest Rate</p>
+                        <p className="text-xl font-bold">{loan.monthlyInterest ? `${loan.monthlyInterest}%` : `${(((loan.repaymentAmount / loan.amount) - 1) * 100).toFixed(2)}%`} monthly</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-600">Duration</p>
+                        <p className="text-xl font-bold">{loan.duration} months</p>
+                      </div>
                     </div>
 
                     <div className="flex justify-between">
                       <span className="font-medium">Status:</span>
                       <Badge
                         className={
-                          asset.status === "Active"
+                          loan.status === "Active"
                             ? "bg-green-500"
-                            : asset.status === "Pending"
+                            : loan.status === "Pending"
                               ? "bg-yellow-500"
                               : "bg-blue-500"
                         }
                       >
-                        {asset.status}
+                        {loan.status}
                       </Badge>
                     </div>
 
-                    {asset.tokenizationHash && (
-                      <div>
-                        <p className="text-xs font-medium text-gray-500 mb-1">Transaction Hash:</p>
-                        <p className="text-xs font-mono break-all bg-gray-50 p-2 rounded">{asset.tokenizationHash}</p>
+                    <div>
+                      <h4 className="font-semibold mb-2">Additional Details</h4>
+                      <div className="space-y-2 text-sm">
+                        <div>
+                          <p className="text-gray-500">Operator</p>
+                          <p className="font-medium">{loan.operator}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Operator Address</p>
+                          <p className="font-mono text-xs truncate">
+                            {loan.borrower}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Transaction Hash</p>
+                          <p className="font-mono text-xs truncate">{loan.transactionHash}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Created</p>
+                          <p>{new Date(loan.createdAt).toLocaleDateString()}</p>
+                        </div>
                       </div>
-                    )}
-
-                    {asset.tokenizationDate && (
-                      <div className="flex justify-between text-sm">
-                        <span className="font-medium">Tokenized on:</span>
-                        <span>{new Date(asset.tokenizationDate).toLocaleDateString()}</span>
-                      </div>
-                    )}
+                    </div>
                   </div>
                 </CardContent>
                 <div className="p-4 pt-0 mt-auto">
@@ -257,66 +270,51 @@ export default function AdminAssetsPage() {
   )
 }
 
-// Default assets if none are in localStorage
-const defaultAssets: Asset[] = [
+// Default loans with monthlyInterest included
+const defaultLoans: Loan[] = [
   {
-    id: "EV-001",
-    name: "Electric Bus Fleet",
+    id: "LOAN-001",
+    name: "EV Loan - MetroTransit",
     image: "/images/electric-bus.jpeg",
-    type: "Bus",
     operator: "MetroTransit",
-    value: 450000,
-    tokenization: 92,
+    borrower: "0x8Ab76F03D2Acf190705EE1FcA0C794931EE2A3B0",
+    adminAddress: "0x4a2de44F7c609Af73852CC99a3fCc318A91C83Bd",
+    amount: 450000,
+    repaymentAmount: 495000,
+    monthlyInterest: 0.83,
+    duration: 24,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
     status: "Active",
+    transactionHash: "0x" + "1".repeat(64),
   },
   {
-    id: "EV-002",
-    name: "Delivery Van",
+    id: "LOAN-002",
+    name: "EV Loan - EcoDelivery",
     image: "/images/ford-vehicle.jpeg",
-    type: "Van",
     operator: "EcoDelivery",
-    value: 85000,
-    tokenization: 78,
+    borrower: "0x8Ab76F03D2Acf190705EE1FcA0C794931EE2A3B0",
+    adminAddress: "0x4a2de44F7c609Af73852CC99a3fCc318A91C83Bd",
+    amount: 85000,
+    repaymentAmount: 93500,
+    monthlyInterest: 0.55,
+    duration: 18,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 60).toISOString(),
     status: "Active",
+    transactionHash: "0x" + "2".repeat(64),
   },
   {
-    id: "EV-003",
-    name: "Taxi Fleet",
+    id: "LOAN-003",
+    name: "EV Loan - GreenCab",
     image: "/images/ford.jpeg",
-    type: "Taxi",
     operator: "GreenCab",
-    value: 320000,
-    tokenization: 65,
-    status: "Active",
-  },
-  {
-    id: "EV-004",
-    name: "Utility Vehicle",
-    image: "/images/ford-vehicle.jpeg",
-    type: "Utility",
-    operator: "CityServices",
-    value: 120000,
-    tokenization: 100,
-    status: "Active",
-  },
-  {
-    id: "EV-005",
-    name: "Electric Bus",
-    image: "/images/electric-bus.jpeg",
-    type: "Bus",
-    operator: "RegionalTransit",
-    value: 480000,
-    tokenization: 45,
+    borrower: "0x8Ab76F03D2Acf190705EE1FcA0C794931EE2A3B0",
+    adminAddress: "0x4a2de44F7c609Af73852CC99a3fCc318A91C83Bd",
+    amount: 320000,
+    repaymentAmount: 368000,
+    monthlyInterest: 0.5,
+    duration: 36,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15).toISOString(),
     status: "Pending",
-  },
-  {
-    id: "EV-006",
-    name: "Commercial Van",
-    image: "/images/ford-vehicle.jpeg",
-    type: "Van",
-    operator: "FastLogistics",
-    value: 95000,
-    tokenization: 0,
-    status: "Onboarding",
-  },
+    transactionHash: "0x" + "3".repeat(64),
+  }
 ]

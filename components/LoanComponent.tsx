@@ -153,7 +153,7 @@ export default function LoanComponent() {
     <Card className="w-full border border-[#4f1964]/20">
       <CardHeader className="bg-[#4f1964]/5">
         <CardTitle className="text-[#4f1964]">Loan Management</CardTitle>
-        <CardDescription className="text-[#4f1964]/70">Invest, repay, or withdraw funds from the loan contract</CardDescription>
+        <CardDescription className="text-[#4f1964]/70">Investing in tokenized EV loans</CardDescription>
       </CardHeader>
       <CardContent>
         {error && (

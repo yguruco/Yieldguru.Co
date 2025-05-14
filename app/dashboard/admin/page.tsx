@@ -1,46 +1,48 @@
 import { StatCard } from "@/components/ui/stat-card"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartPlaceholder } from "@/components/dashboard/chart-placeholder"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ArrowUpRight } from "lucide-react"
+import Link from "next/link"
 
 export default function AdminDashboardPage() {
   return (
     <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+        <p className="text-muted-foreground">Manage tokenized EV loans platform</p>
+      </div>
+      
       <div className="grid gap-6 md:grid-cols-3">
         <StatCard title="Total Assets" value="1,245" description="+12% from last month" />
-        <StatCard title="Active Investors" value="867" description="+5% from last month" delay={0.1} />
-        <StatCard title="Total Value Locked" value="$24.5M" description="+18% from last month" delay={0.2} />
+        <StatCard title="Active Investors" value="867" description="+5% from last month" />
+        <StatCard title="Total Value Locked" value="$24.5M" description="+18% from last month" />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Asset Distribution</CardTitle>
-            <CardDescription>Breakdown of tokenized EV assets by type</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartPlaceholder
-              type="pie"
-              title="Asset Distribution"
-              description="Breakdown by vehicle type"
-              accentColor="#4f1964"
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Tokenization Growth</CardTitle>
-            <CardDescription>Monthly tokenization volume in thousands</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartPlaceholder
-              type="bar"
-              title="Monthly Growth"
-              description="Volume in thousands"
-              accentColor="#4f1964"
-            />
-          </CardContent>
-        </Card>
+        <Link href="/dashboard/admin/assets" className="block">
+          <Card className="h-full hover:shadow-md transition-shadow">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                Manage Assets <ArrowUpRight className="h-5 w-5" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">View and manage all tokenized EV loans on the platform</p>
+            </CardContent>
+          </Card>
+        </Link>
+        
+        <Link href="/dashboard/admin/tokenize" className="block">
+          <Card className="h-full hover:shadow-md transition-shadow">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                Create New Loan <ArrowUpRight className="h-5 w-5" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">Create new tokenized EV loans on the platform</p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
     </div>
   )
