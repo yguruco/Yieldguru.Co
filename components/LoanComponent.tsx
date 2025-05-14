@@ -37,7 +37,7 @@ export default function LoanComponent() {
   // Get loan data from contract
   const { data: borrowerData } = useReadContract({
     address: myLoanContract.address,
-    abi: myLoanContract.abi,
+    abi: myLoanContract,
     functionName: 'borrower',
   })
   

@@ -11,6 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Progress } from "@/components/ui/progress"
 import { useRouter } from "next/navigation"
 import { Check } from "lucide-react"
+import { motion } from "framer-motion"
 
 export default function CreateLoanPage() {
   const router = useRouter()
@@ -162,7 +163,7 @@ export default function CreateLoanPage() {
         <p className="text-muted-foreground">Create a new tokenized EV loan on the platform</p>
       </div>
 
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <Card>
           <CardHeader>
             <CardTitle>Loan Details</CardTitle>
@@ -221,7 +222,7 @@ export default function CreateLoanPage() {
                 </div>
               </div>
             ) : (
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className="grid gap-6 md:grid-cols-2 max-w-3xl mx-auto">
                 {/* Left column - Form fields */}
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -343,66 +344,81 @@ export default function CreateLoanPage() {
                   </div>
                 </div>
 
-                {/* Right column - Preview */}
+                {/* Right column - Preview with 3D motion */}
                 <div>
                   <Label className="block mb-2">Loan Preview</Label>
-                  <Card className="overflow-hidden h-full">
-                    <div className="w-full h-[180px] relative">
-                      {loanImage ? (
-                        <Image src={loanImage} alt="Loan" fill className="object-cover" />
-                      ) : (
-                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                          <Camera className="h-12 w-12 text-gray-400" />
+                  <motion.div 
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    style={{ transformStyle: "preserve-3d", perspective: 1000 }}
+                  >
+                    <motion.div
+                      whileHover={{ rotateY: 5, rotateX: -5 }}
+                      whileTap={{ rotateY: 0, rotateX: 0 }}
+                      className="h-full"
+                    >
+                      <Card className="overflow-hidden h-full shadow-lg">
+                        <div className="w-full h-[180px] relative">
+                          {loanImage ? (
+                            <Image src={loanImage} alt="Loan" fill className="object-cover" />
+                          ) : (
+                            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                              <Camera className="h-12 w-12 text-gray-400" />
+                            </div>
+                          )}
+                          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black/50" />
+                          <div className="absolute top-4 right-4">
+                            <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium">
+                              EV Loan
+                            </div>
+                          </div>
                         </div>
-                      )}
-                      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black/50" />
-                      <div className="absolute top-4 right-4">
-                        <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium">
-                          EV Loan
-                        </div>
-                      </div>
-                    </div>
 
-                    <CardContent className="p-4">
-                      <h3 className="text-xl font-bold mb-2">{operatorName || "Loan"} Summary</h3>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Amount:</span>
-                          <span className="font-medium">${loanAmount ? Number(loanAmount).toLocaleString() : "0"}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Interest Rate:</span>
-                          <span className="font-medium">{monthlyInterest || "0"}% monthly</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Duration:</span>
-                          <span className="font-medium">{durationMonths || "0"} months</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Repayment:</span>
-                          <span className="font-medium">${repaymentAmount ? Number(repaymentAmount).toLocaleString() : "0"}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Total Interest:</span>
-                          <span className="font-medium text-green-600">
-                            {loanAmount && repaymentAmount
-                              ? `$${(Number(repaymentAmount) - Number(loanAmount)).toLocaleString()}`
-                              : "$0"}
-                          </span>
-                        </div>
-                      </div>
+                        <CardContent className="p-4">
+                          <h3 className="text-xl font-bold mb-2">{operatorName || "Loan"} Summary</h3>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Amount:</span>
+                              <span className="font-medium">${loanAmount ? Number(loanAmount).toLocaleString() : "0"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Interest Rate:</span>
+                              <span className="font-medium">{monthlyInterest || "0"}% monthly</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Duration:</span>
+                              <span className="font-medium">{durationMonths || "0"} months</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Repayment:</span>
+                              <span className="font-medium">${repaymentAmount ? Number(repaymentAmount).toLocaleString() : "0"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Total Interest:</span>
+                              <span className="font-medium text-green-600">
+                                {loanAmount && repaymentAmount
+                                  ? `$${(Number(repaymentAmount) - Number(loanAmount)).toLocaleString()}`
+                                  : "$0"}
+                              </span>
+                            </div>
+                          </div>
 
-                      <div className="mt-4 pt-3 border-t border-gray-200">
-                        <p className="text-xs text-gray-500 mb-1">Operator:</p>
-                        <p className="text-xs font-medium truncate">
-                          {operatorName || "Not specified"}
-                        </p>
-                        <p className="text-xs font-mono truncate mt-1">
-                          {operatorAddress ? `${operatorAddress.slice(0, 10)}...${operatorAddress.slice(-6)}` : ""}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                          <div className="mt-4 pt-3 border-t border-gray-200">
+                            <p className="text-xs text-gray-500 mb-1">Operator:</p>
+                            <p className="text-xs font-medium truncate">
+                              {operatorName || "Not specified"}
+                            </p>
+                            <p className="text-xs font-mono truncate mt-1">
+                              {operatorAddress ? `${operatorAddress.slice(0, 10)}...${operatorAddress.slice(-6)}` : ""}
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </motion.div>
 
                   <div className="mt-6">
                     {isProcessing ? (

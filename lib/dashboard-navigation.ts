@@ -1,4 +1,4 @@
-import { BarChart, BookOpen, Car, Home, LineChart, Shield, Truck, Wallet } from "lucide-react"
+import { BarChart, BookOpen, Car, Home, LineChart, Shield, Truck, Wallet, RefreshCw } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 interface NavItem {
@@ -23,7 +23,7 @@ export function getNavItems(dashboardType: string): NavItem[] {
   ]
 
   const operatorItems = [
-    { name: "Fleet", href: "/fleet", icon: Truck },
+    { name: "Loan Repayment", href: "/loan-repayment", icon: RefreshCw },
     { name: "Performance", href: "/performance", icon: Shield },
     { name: "RFT", href: "/rft", icon: BookOpen },
     { name: "My Assets", href: "/my-assets", icon: Car },
