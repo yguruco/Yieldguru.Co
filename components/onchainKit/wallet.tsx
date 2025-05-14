@@ -19,7 +19,7 @@ import { color } from '@coinbase/onchainkit/theme';
 
 export function WalletComponents() {
     return (
-        <div className="flex justify-end">
+        <div className="flex justify-center mt-8">
             <Wallet>
                 {/* Login button - using purple background with yellow text */}
                 <ConnectWallet

@@ -2,16 +2,19 @@
 
 import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
-import { Camera, X, Shield } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Camera, X, Shield, Info, Loader2 } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Progress } from "@/components/ui/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useRouter } from "next/navigation"
 import { Check } from "lucide-react"
 import { motion } from "framer-motion"
+import { ApplicationLookup } from "@/components/rfl/application-lookup"
+import type { RFLSubmission } from "@/types/rfl"
 
 export default function CreateLoanPage() {
   const router = useRouter()
@@ -27,6 +30,8 @@ export default function CreateLoanPage() {
   const [createComplete, setCreateComplete] = useState(false)
   const [transactionHash, setTransactionHash] = useState("")
   const [error, setError] = useState("")
+  const [activeTab, setActiveTab] = useState("manual")
+  const [loadingApplication, setLoadingApplication] = useState(false)
 
   // For image upload
   const [loanImage, setLoanImage] = useState<string | null>(null)
@@ -77,11 +82,6 @@ export default function CreateLoanPage() {
       return
     }
 
-    // Set a default image if none is provided
-    if (!loanImage) {
-      setLoanImage("/images/ford-vehicle.jpeg")
-    }
-
     setError("")
     setIsProcessing(true)
     setProcessProgress(0)
@@ -111,7 +111,7 @@ export default function CreateLoanPage() {
       const newLoan = {
         id: `LOAN-${Date.now().toString(36)}`,
         name: `EV Loan - ${operatorName}`,
-        image: loanImage,
+        image: loanImage || null,  // Use null if no image provided
         operator: operatorName,
         borrower: operatorAddress,
         adminAddress: adminAddress,
@@ -156,6 +156,41 @@ export default function CreateLoanPage() {
     router.push("/dashboard/admin/assets")
   }
 
+  const handleApplicationFound = (application: RFLSubmission) => {
+    setLoadingApplication(true)
+    
+    // Simulate loading delay
+    setTimeout(() => {
+      // Populate the form with application data
+      setOperatorName(application.applicantDetails.name)
+      setOperatorAddress(application.applicantDetails.walletAddress)
+      setLoanAmount(application.applicantDetails.totalFinancingRequested)
+      
+      // Set a default admin address if empty
+      if (!adminAddress) {
+        setAdminAddress("0x7a95eA21F1A21b14a2E26Da855Ab435D5E1E3C39")
+      }
+      
+      // Set default duration and interest if empty
+      if (!durationMonths) {
+        setDurationMonths("12")
+      }
+      
+      if (!monthlyInterest) {
+        setMonthlyInterest("1.5")
+      }
+      
+      // Set the facial scan as loan image if available
+      if (application.facialScanData) {
+        setLoanImage(application.facialScanData)
+      }
+      
+      // Switch to manual tab after loading
+      setActiveTab("manual")
+      setLoadingApplication(false)
+    }, 1000)
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -167,6 +202,9 @@ export default function CreateLoanPage() {
         <Card>
           <CardHeader>
             <CardTitle>Loan Details</CardTitle>
+            <CardDescription>
+              Create a new loan manually or by using existing RFL application data
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {error && (
@@ -174,6 +212,15 @@ export default function CreateLoanPage() {
                 <AlertTitle>Error</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
+            )}
+
+            {loadingApplication && (
+              <div className="flex items-center justify-center py-10">
+                <div className="text-center">
+                  <Loader2 className="h-10 w-10 animate-spin text-[#f68b27] mx-auto mb-4" />
+                  <p className="text-muted-foreground">Loading application data...</p>
+                </div>
+              </div>
             )}
 
             {createComplete ? (
@@ -206,6 +253,21 @@ export default function CreateLoanPage() {
 
                     <div className="font-medium">Transaction Hash:</div>
                     <div className="break-all font-mono text-xs">{transactionHash}</div>
+                    
+                    {loanImage && (
+                      <>
+                        <div className="font-medium">Vehicle Image:</div>
+                        <div>
+                          <Image 
+                            src={loanImage} 
+                            alt="Vehicle image" 
+                            width={100} 
+                            height={80} 
+                            className="object-cover rounded-md" 
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -222,225 +284,171 @@ export default function CreateLoanPage() {
                 </div>
               </div>
             ) : (
-              <div className="grid gap-6 md:grid-cols-2 max-w-3xl mx-auto">
-                {/* Left column - Form fields */}
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="operator-name">Operator Name</Label>
-                    <Input
-                      id="operator-name"
-                      placeholder="Enter operator name"
-                      value={operatorName}
-                      onChange={(e) => setOperatorName(e.target.value)}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="loan-amount">Loan Amount ($)</Label>
-                    <Input
-                      id="loan-amount"
-                      placeholder="Enter loan amount"
-                      type="number"
-                      value={loanAmount}
-                      onChange={(e) => setLoanAmount(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="operator-address">Operator Address</Label>
-                    <Input
-                      id="operator-address"
-                      placeholder="Enter operator wallet address"
-                      value={operatorAddress}
-                      onChange={(e) => setOperatorAddress(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="admin-address">Admin Address</Label>
-                    <Input
-                      id="admin-address"
-                      placeholder="Enter admin wallet address"
-                      value={adminAddress}
-                      onChange={(e) => setAdminAddress(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
+              <div>
+                {!loadingApplication && (
+                  <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="manual">Manual Entry</TabsTrigger>
+                      <TabsTrigger value="application">Use RFL Application</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="application" className="mt-6">
+                      <div className="space-y-4">
+                        <Alert className="bg-blue-50 border-blue-200">
+                          <Info className="h-4 w-4 text-blue-600" />
+                          <AlertDescription className="text-blue-700">
+                            Enter an RFL application ID to automatically populate the loan form with the applicant's details.
+                          </AlertDescription>
+                        </Alert>
+                        <ApplicationLookup onApplicationFound={handleApplicationFound} />
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                )}
+                
+                <div className="grid gap-6 md:grid-cols-2 max-w-3xl mx-auto">
+                  {/* Left column - Form fields */}
+                  <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="duration">Duration (months)</Label>
+                      <Label htmlFor="operator-name">Operator Name</Label>
+                      <Input
+                        id="operator-name"
+                        placeholder="Enter operator name"
+                        value={operatorName}
+                        onChange={(e) => setOperatorName(e.target.value)}
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="loan-amount">Loan Amount ($)</Label>
+                      <Input
+                        id="loan-amount"
+                        placeholder="Enter loan amount"
+                        type="number"
+                        value={loanAmount}
+                        onChange={(e) => setLoanAmount(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="operator-address">Operator Address</Label>
+                      <Input
+                        id="operator-address"
+                        placeholder="Enter operator wallet address"
+                        value={operatorAddress}
+                        onChange={(e) => setOperatorAddress(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="admin-address">Admin Address</Label>
+                      <Input
+                        id="admin-address"
+                        placeholder="Enter admin wallet address"
+                        value={adminAddress}
+                        onChange={(e) => setAdminAddress(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Right column - More fields & image */}
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="duration">Duration (Months)</Label>
                       <Input
                         id="duration"
-                        placeholder="Enter months"
+                        placeholder="Enter loan duration"
                         type="number"
                         value={durationMonths}
                         onChange={(e) => setDurationMonths(e.target.value)}
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
-                      <Label htmlFor="interest">Monthly Interest (%)</Label>
+                      <Label htmlFor="interest">Monthly Interest Rate (%)</Label>
                       <Input
                         id="interest"
-                        placeholder="Interest rate"
+                        placeholder="Enter monthly interest rate"
                         type="number"
                         step="0.01"
                         value={monthlyInterest}
                         onChange={(e) => setMonthlyInterest(e.target.value)}
                       />
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="repayment-amount">Repayment Amount ($)</Label>
-                    <Input
-                      id="repayment-amount"
-                      placeholder="Calculated automatically"
-                      type="number"
-                      value={repaymentAmount}
-                      onChange={(e) => setRepaymentAmount(e.target.value)}
-                      className="bg-gray-50"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      This field is calculated automatically based on loan amount, duration, and interest rate
-                    </p>
-                  </div>
 
-                  <div className="space-y-2">
-                    <Label>Loan Image</Label>
-                    <div className="border-2 border-dashed rounded-md p-4">
-                      {loanImage ? (
-                        <div className="relative">
-                          <Image
-                            src={loanImage || "/placeholder.svg"}
-                            alt="Loan preview"
-                            width={300}
-                            height={200}
-                            className="w-full h-auto rounded-md"
-                          />
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            className="absolute top-2 right-2 h-8 w-8 rounded-full"
-                            onClick={handleRemoveImage}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center py-4">
-                          <Camera className="h-10 w-10 text-gray-400 mb-2" />
-                          <p className="text-sm text-gray-500 mb-2">Upload an image for the loan</p>
-                          <Input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                            className="max-w-xs"
-                          />
-                        </div>
-                      )}
+                    <div className="space-y-2">
+                      <Label htmlFor="repayment">Total Repayment Amount</Label>
+                      <Input
+                        id="repayment"
+                        placeholder="Will be calculated automatically"
+                        value={repaymentAmount ? `$${Number(repaymentAmount).toLocaleString()}` : ""}
+                        readOnly
+                        className="bg-gray-50"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Vehicle Image (Optional)</Label>
+                      <div className="flex justify-center p-4 border-2 border-dashed rounded-md">
+                        {loanImage ? (
+                          <div className="relative">
+                            <Image
+                              src={loanImage}
+                              alt="Vehicle image"
+                              width={200}
+                              height={150}
+                              className="object-cover rounded-md"
+                            />
+                            <button
+                              type="button"
+                              onClick={handleRemoveImage}
+                              className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="text-center">
+                            <Camera className="mx-auto h-12 w-12 text-gray-400" />
+                            <div className="mt-2 flex flex-col items-center">
+                              <label
+                                htmlFor="file-upload"
+                                className="cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500"
+                              >
+                                <span>Upload an image (optional)</span>
+                                <input
+                                  id="file-upload"
+                                  name="file-upload"
+                                  type="file"
+                                  className="sr-only"
+                                  ref={fileInputRef}
+                                  onChange={handleImageUpload}
+                                  accept="image/*"
+                                />
+                              </label>
+                              <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Right column - Preview with 3D motion */}
-                <div>
-                  <Label className="block mb-2">Loan Preview</Label>
-                  <motion.div 
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.98 }}
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ duration: 0.5 }}
-                    style={{ transformStyle: "preserve-3d", perspective: 1000 }}
-                  >
-                    <motion.div
-                      whileHover={{ rotateY: 5, rotateX: -5 }}
-                      whileTap={{ rotateY: 0, rotateX: 0 }}
-                      className="h-full"
-                    >
-                      <Card className="overflow-hidden h-full shadow-lg">
-                        <div className="w-full h-[180px] relative">
-                          {loanImage ? (
-                            <Image src={loanImage} alt="Loan" fill className="object-cover" />
-                          ) : (
-                            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                              <Camera className="h-12 w-12 text-gray-400" />
-                            </div>
-                          )}
-                          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black/50" />
-                          <div className="absolute top-4 right-4">
-                            <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium">
-                              EV Loan
-                            </div>
-                          </div>
-                        </div>
-
-                        <CardContent className="p-4">
-                          <h3 className="text-xl font-bold mb-2">{operatorName || "Loan"} Summary</h3>
-                          <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                              <span className="text-gray-500">Amount:</span>
-                              <span className="font-medium">${loanAmount ? Number(loanAmount).toLocaleString() : "0"}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-500">Interest Rate:</span>
-                              <span className="font-medium">{monthlyInterest || "0"}% monthly</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-500">Duration:</span>
-                              <span className="font-medium">{durationMonths || "0"} months</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-500">Repayment:</span>
-                              <span className="font-medium">${repaymentAmount ? Number(repaymentAmount).toLocaleString() : "0"}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-500">Total Interest:</span>
-                              <span className="font-medium text-green-600">
-                                {loanAmount && repaymentAmount
-                                  ? `$${(Number(repaymentAmount) - Number(loanAmount)).toLocaleString()}`
-                                  : "$0"}
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="mt-4 pt-3 border-t border-gray-200">
-                            <p className="text-xs text-gray-500 mb-1">Operator:</p>
-                            <p className="text-xs font-medium truncate">
-                              {operatorName || "Not specified"}
-                            </p>
-                            <p className="text-xs font-mono truncate mt-1">
-                              {operatorAddress ? `${operatorAddress.slice(0, 10)}...${operatorAddress.slice(-6)}` : ""}
-                            </p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  </motion.div>
-
-                  <div className="mt-6">
-                    {isProcessing ? (
-                      <div className="space-y-4">
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Creating loan...</span>
-                          <span>{Math.round(processProgress)}%</span>
-                        </div>
-                        <Progress value={processProgress} className="h-2" />
-                      </div>
-                    ) : (
-                      <Button
-                        onClick={handleCreateLoan}
-                        className="w-full bg-[#4f1964] hover:bg-[#4f1964]/90"
-                        disabled={isProcessing}
-                      >
-                        <Shield className="mr-2 h-4 w-4" />
-                        Create EV Loan
-                      </Button>
-                    )}
+                {isProcessing ? (
+                  <div className="mt-8 space-y-4">
+                    <Progress value={processProgress} className="w-full" />
+                    <p className="text-center text-sm text-muted-foreground">
+                      Creating loan... ({Math.round(processProgress)}% complete)
+                    </p>
                   </div>
-                </div>
+                ) : (
+                  <div className="mt-8 flex justify-center">
+                    <Button className="w-1/2 bg-[#f68b27] hover:bg-[#f68b27]/90" onClick={handleCreateLoan}>
+                      Create Loan
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>

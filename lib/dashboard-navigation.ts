@@ -12,7 +12,7 @@ export function getNavItems(dashboardType: string): NavItem[] {
 
   const adminItems = [
     { name: "Assets", href: "/assets", icon: Wallet },
-    { name: "RFT Approvals", href: "/rft-approvals", icon: BookOpen },
+    { name: "RFL Approvals", href: "/rfl-approvals", icon: BookOpen },
     { name: "Tokenize", href: "/tokenize", icon: Shield },
     { name: "Create Loan", href: "/create-loan", icon: Wallet },
   ]
@@ -25,7 +25,7 @@ export function getNavItems(dashboardType: string): NavItem[] {
   const operatorItems = [
     { name: "Loan Repayment", href: "/loan-repayment", icon: RefreshCw },
     { name: "Performance", href: "/performance", icon: Shield },
-    { name: "RFT", href: "/rft", icon: BookOpen },
+    { name: "RFL", href: "/rfl", icon: BookOpen },
     { name: "My Assets", href: "/my-assets", icon: Car },
   ]
 

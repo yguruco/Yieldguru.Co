@@ -7,6 +7,7 @@ import { getNavItems } from "@/lib/dashboard-navigation"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
+import ClientWallet from "@/components/onchainKit/ClientWallet"
 
 interface DashboardSidebarProps {
   isOpen: boolean
@@ -56,6 +57,11 @@ export function DashboardSidebar({ isOpen, dashboardType, accentColor }: Dashboa
                   )
                 })}
               </ul>
+              
+              {/* Wallet at the bottom of the sidebar */}
+              <div className="mt-auto pt-6 border-t border-gray-200 mt-6">
+                <ClientWallet />
+              </div>
             </nav>
           </motion.aside>
         )}
@@ -96,6 +102,11 @@ export function DashboardSidebar({ isOpen, dashboardType, accentColor }: Dashboa
                   )
                 })}
               </ul>
+              
+              {/* Wallet at the bottom of the mobile sidebar */}
+              <div className="mt-auto pt-6 border-t border-gray-200 mt-6">
+                <ClientWallet />
+              </div>
             </nav>
           </SheetContent>
         </Sheet>
