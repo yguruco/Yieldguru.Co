@@ -146,82 +146,30 @@ export default function OperatorDashboard() {
       >
         <Card className="border border-[#4f1964]/20">
           <CardHeader className="bg-[#4f1964]/5">
-            <CardTitle>Loan Repayment</CardTitle>
-            <CardDescription>Repay your outstanding EV loans</CardDescription>
+            <CardTitle>Loan Management</CardTitle>
+            <CardDescription>Search and manage your EV loans</CardDescription>
           </CardHeader>
           <CardContent className="pt-4">
-            {error && (
-              <Alert variant="destructive" className="mb-4 bg-red-50 border border-red-200">
-                <AlertTriangle className="h-4 w-4 text-red-600" />
-                <AlertTitle className="text-red-800">Error</AlertTitle>
-                <AlertDescription className="text-red-800">{error}</AlertDescription>
-              </Alert>
-            )}
-
-            {isConfirmed && (
-              <Alert className="mb-4 bg-[#f68b27]/10 border border-[#f68b27]/30">
-                <Check className="h-4 w-4 text-[#f68b27]" />
-                <AlertTitle className="text-[#f68b27]">Success</AlertTitle>
-                <AlertDescription className="text-[#f68b27]">Transaction completed successfully!</AlertDescription>
-              </Alert>
-            )}
-
-            {isPending && (
-              <div className="mb-4">
-                <p className="text-sm mb-2 text-[#4f1964]">Processing transaction...</p>
-                <Progress value={txProgress} className="h-2 bg-[#fbdc3e]/20" />
-              </div>
-            )}
-        
             <div className="p-4 bg-[#fbdc3e]/5 rounded-md border border-[#fbdc3e]/20 mb-4">
-              <h3 className="text-lg font-semibold mb-2 text-[#4f1964]">Loan Details</h3>
+              <h3 className="text-lg font-semibold mb-2 text-[#4f1964]">Loan Overview</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="mb-2 text-[#4f1964]">
-                  <strong>Total Repayment Amount:</strong> {loanDetails.repaymentAmount} ETH
+                  <strong>Active Loans:</strong> 2
                 </div>
                 <div className="mb-2 text-[#4f1964]">
-                  <strong>Current Balance:</strong> {loanDetails.balance} ETH
+                  <strong>Total Outstanding:</strong> $58,640
                 </div>
               </div>
             </div>
 
-            {!isConnected ? (
-              <div className="text-center py-6">
-                <p className="mb-4 text-[#4f1964]">Please connect your wallet to interact with the loan contract</p>
-              </div>
-            ) : (
-              <div className="grid gap-4 p-4 bg-[#fbdc3e]/5 rounded-md border border-[#fbdc3e]/20">
-                <div className="space-y-2">
-                  <Label htmlFor="repay-amount" className="text-[#4f1964] font-medium">Amount to Repay (ETH)</Label>
-                  <Input
-                    id="repay-amount"
-                    type="number"
-                    step="0.01"
-                    placeholder="0.0"
-                    value={repayAmount}
-                    onChange={(e) => setRepayAmount(e.target.value)}
-                    className="border-[#4f1964]/30 focus:border-[#4f1964] focus:ring-[#4f1964]/20"
-                  />
-                </div>
-                <Button 
-                  onClick={repayLoan} 
-                  disabled={isPending || isConfirming || !repayAmount}
-                  className="bg-[#4f1964] hover:bg-[#3b1149] text-[#fbdc3e] font-medium border border-[#fbdc3e]/20"
-                >
-                  {isPending || isConfirming ? 'Processing...' : 'Repay Loan'}
-                </Button>
-                
-                {isBorrower() && (
-                  <Button 
-                    onClick={withdrawLoan} 
-                    disabled={isPending || isConfirming || loanDetails.balance === "0"}
-                    className="bg-[#f68b27] hover:bg-[#e57916] text-white font-medium mt-2"
-                  >
-                    {isPending || isConfirming ? 'Processing...' : 'Withdraw Loan'}
-                  </Button>
-                )}
-              </div>
-            )}
+            <Button 
+              className="w-full bg-[#4f1964] hover:bg-[#3b1149] text-[#fbdc3e] font-medium border border-[#fbdc3e]/20"
+              asChild
+            >
+              <a href="/dashboard/operator/loan-management">
+                Go to Loan Management
+              </a>
+            </Button>
           </CardContent>
         </Card>
       </motion.div>

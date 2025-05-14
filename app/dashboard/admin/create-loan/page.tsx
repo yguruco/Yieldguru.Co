@@ -15,6 +15,7 @@ import { Check } from "lucide-react"
 import { motion } from "framer-motion"
 import { ApplicationLookup } from "@/components/rfl/application-lookup"
 import type { RFLSubmission } from "@/types/rfl"
+import { MintNFT } from "@/components/AdminNFT"
 
 export default function CreateLoanPage() {
   const router = useRouter()
@@ -197,7 +198,7 @@ export default function CreateLoanPage() {
         <h1 className="text-3xl font-bold tracking-tight">Create EV Loan</h1>
         <p className="text-muted-foreground">Create a new tokenized EV loan on the platform</p>
       </div>
-
+      
       <div className="max-w-4xl mx-auto">
         <Card>
           <CardHeader>
@@ -451,6 +452,18 @@ export default function CreateLoanPage() {
                 )}
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Mint NFT</CardTitle>
+            <CardDescription>
+              Create a new NFT for your asset
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <MintNFT />
           </CardContent>
         </Card>
       </div>

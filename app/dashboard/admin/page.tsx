@@ -31,7 +31,7 @@ export default function AdminDashboardPage() {
           </Card>
         </Link>
         
-        <Link href="/dashboard/admin/tokenize" className="block">
+        <Link href="/dashboard/admin/create-loan" className="block">
           <Card className="h-full hover:shadow-md transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
