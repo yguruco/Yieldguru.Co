@@ -11,13 +11,16 @@ import TestimonialsSection from "@/components/sections/testimonials-section"
 import CTASection from "@/components/sections/cta-section"
 import BlogSection from "@/components/sections/blog-section"
 import FooterSection from "@/components/sections/footer-section"
+import LoanComponent from "@/components/LoanComponent"
 
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
+      
       <HeroSection />
       <DashboardSection />
+
       <FeaturesSection />
       {/* <CTASection /> */}
 
@@ -31,6 +34,7 @@ export default function Home() {
       </section> */}
 
       <BlogSection />
+      <LoanComponent />
       <TestimonialsSection />
       <FooterSection />
     </div>

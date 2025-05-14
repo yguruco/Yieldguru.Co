@@ -11,10 +11,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
-// Add the import for the user store
-import { useUserStore } from "@/lib/user-store"
-import { v4 as uuidv4 } from "uuid"
-
 interface LoginFormProps {
   dashboardType: string
   accentColor: string
@@ -27,9 +23,6 @@ export default function LoginForm({ dashboardType, accentColor, passwordRequirem
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
-
-  // Get the user store functions outside the handleSubmit function
-  const { users, addUser, updateUserLastLogin } = useUserStore()
 
   const validatePassword = (password: string): boolean => {
     // Different validation based on dashboard type
@@ -45,7 +38,6 @@ export default function LoginForm({ dashboardType, accentColor, passwordRequirem
     }
   }
 
-  // Update the handleSubmit function to track logins
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -55,33 +47,6 @@ export default function LoginForm({ dashboardType, accentColor, passwordRequirem
     }
 
     setIsLoading(true)
-
-    // Check if the user exists
-    const existingUser = users.find((user) => user.email === email)
-
-    if (existingUser) {
-      // Update last login time
-      updateUserLastLogin(existingUser.id)
-    } else {
-      // Add new user
-      addUser({
-        id: uuidv4(),
-        name: email.split("@")[0], // Simple name extraction from email
-        email,
-        role: dashboardType === "admin" ? "Admin" : dashboardType === "investor" ? "Investor" : "Operator",
-        status: "Active",
-        lastLogin: new Date()
-          .toLocaleString("en-US", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          })
-          .replace(",", ""),
-      })
-    }
 
     // Simulate authentication
     setTimeout(() => {

@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { StatCard } from "@/components/ui/stat-card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ChartPlaceholder } from "@/components/dashboard/chart-placeholder"
-import LiquidityPoolInterface from "@/components/liquidity-pool-interface"
 
 export default function OperatorDashboardPage() {
   return (
@@ -14,10 +13,9 @@ export default function OperatorDashboardPage() {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="liquidity">Liquidity Pool</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4 pt-4">
@@ -99,10 +97,6 @@ export default function OperatorDashboardPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="liquidity" className="space-y-4 pt-4">
-          <LiquidityPoolInterface />
         </TabsContent>
       </Tabs>
     </div>
