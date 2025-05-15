@@ -39,13 +39,15 @@ We've migrated from localStorage to MongoDB for the following reasons:
 
 ### 5. Configure Environment Variables
 
-1. Update the `.env.local` file in the root of your project with your MongoDB connection string:
+1. Update the `.env` file in the root of your project with your MongoDB connection string:
 
 ```
 MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/<dbname>?retryWrites=true&w=majority
 ```
 
 Replace `<username>`, `<password>`, `<cluster-url>`, and `<dbname>` with your actual values.
+
+Note: For local development, you can also use `.env.local` which will override values in `.env`.
 
 ## Verifying the Setup
 

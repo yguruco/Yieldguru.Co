@@ -12,8 +12,8 @@ The Yieldguru platform uses MongoDB to store all user data, including admin user
 
 The easiest way to create an admin user is to use the provided seed script:
 
-1. Make sure your MongoDB connection is properly configured in `.env.local`
-2. Optionally, customize the admin credentials in `.env.local`:
+1. Make sure your MongoDB connection is properly configured in `.env` or `.env.local`
+2. Optionally, customize the admin credentials in `.env` or `.env.local`:
    ```
    ADMIN_EMAIL=your-admin-email@example.com
    ADMIN_PASSWORD=your-secure-password

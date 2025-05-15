@@ -1,7 +1,12 @@
 // This script seeds the initial admin user in the database
 // Run with: node scripts/seed-admin.js
 
-require('dotenv').config({ path: '.env.local' });
+// Try to load from .env first, then fall back to .env.local if needed
+require('dotenv').config();
+// If any required variables are missing, try .env.local as fallback
+if (!process.env.MONGODB_URI) {
+  require('dotenv').config({ path: '.env.local' });
+}
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -52,32 +57,32 @@ async function seedAdmin() {
 
     // Check if admin already exists
     const existingAdmin = await User.findOne({ email: ADMIN_EMAIL });
-    
+
     if (existingAdmin) {
       console.log(`Admin user with email ${ADMIN_EMAIL} already exists`);
-      
+
       // Ask if we should update the password
       const readline = require('readline').createInterface({
         input: process.stdin,
         output: process.stdout
       });
-      
+
       readline.question('Do you want to update the admin password? (y/n): ', async (answer) => {
         if (answer.toLowerCase() === 'y') {
           // Hash the password
           const salt = await bcrypt.genSalt(10);
           const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, salt);
-          
+
           // Update the admin user
           await User.findByIdAndUpdate(existingAdmin._id, {
             password: hashedPassword
           });
-          
+
           console.log('Admin password updated successfully');
         } else {
           console.log('Admin password not updated');
         }
-        
+
         readline.close();
         await mongoose.disconnect();
         console.log('Disconnected from MongoDB');
@@ -86,7 +91,7 @@ async function seedAdmin() {
       // Hash the password
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, salt);
-      
+
       // Create the admin user
       const admin = new User({
         name: ADMIN_NAME,
@@ -96,10 +101,10 @@ async function seedAdmin() {
         status: 'Active',
         lastLogin: new Date()
       });
-      
+
       await admin.save();
       console.log(`Admin user created with email: ${ADMIN_EMAIL}`);
-      
+
       await mongoose.disconnect();
       console.log('Disconnected from MongoDB');
     }
