@@ -4,14 +4,14 @@ import { motion, AnimatePresence } from "framer-motion"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowUpRight } from "lucide-react"
+import { ArrowUpRight, Wallet, Percent, CreditCard, BarChart3 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Progress } from "@/components/ui/progress"
 import { Check, AlertTriangle } from "lucide-react"
 import ViewInvest from "@/app/dashboard/investCard/viewinvest"
-import { 
+import {
   useAccount,
   useReadContract,
   useWriteContract,
@@ -19,12 +19,31 @@ import {
 } from 'wagmi'
 import { formatEther, parseEther } from 'viem'
 import { LoanContractABI } from "@/contractsAbi/LoanContractABI"
+import NeumorphicStatCard from "@/components/dashboard/neumorphic-stat-card"
 
 // Sample contract address for demonstration
 const LoanContractAddress = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199" as `0x${string}`
 
 export default function InvestorDashboard() {
-  
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  };
+
+  // Get accent color for investor dashboard
+  const accentColor = "#fbdc3e";
+
   return (
     <motion.div
       className="space-y-6"
@@ -99,7 +118,7 @@ export default function InvestorDashboard() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   )
 }
 
@@ -107,10 +126,10 @@ interface StatCardProps {
   title: string
   value: string
   description: string
-  delay: number
+  delay?: number
 }
 
-function StatCard({ title, value, description, delay }: StatCardProps) {
+function StatCard({ title, value, description, delay = 0 }: StatCardProps) {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay }}>
       <Card>
