@@ -17,7 +17,7 @@ import { ApplicationLookup } from "@/components/rfl/application-lookup"
 import type { RFLSubmission } from "@/types/rfl"
 import { MintNFT } from "@/components/AdminNFT"
 import { CreateLoanForm } from "@/components/CreateLoanForm"
-import { LoanEventsDisplay } from "@/components/LoanEventsDisplay"
+// import { LoanEventsDisplay } from "@/components/LoanEventsDisplay"
 import ClientWallet from "@/components/onchainKit/ClientWallet"
 import { LoanList } from "@/components/LoanList"
 
@@ -354,7 +354,7 @@ export default function CreateLoanPage() {
                               <LoanList />
                             </div>
                           </div>
-                          <LoanEventsDisplay onNewLoanAddress={handleLoanCreated} />
+                          {/* <LoanEventsDisplay onNewLoanAddress={handleLoanCreated} /> */}
                         </div>
                       </div>
                     </TabsContent>

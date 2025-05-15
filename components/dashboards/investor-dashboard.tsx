@@ -33,26 +33,26 @@ export default function InvestorDashboard() {
     
   // Get loan data from contract
   const { data: borrowerData } = useReadContract({
-    address: myLoanContract.address,
-    abi: myLoanContract.abi,
+    address:LoanContractAddress,
+    abi: LoanContractABI,
     functionName: 'borrower',
   })
   
   const { data: amountBorrowedData } = useReadContract({
-    address: myLoanContract.address,
-    abi: myLoanContract.abi,
+    address:LoanContractAddress,
+    abi: LoanContractABI,
     functionName: 'amountBorrowed',
   })
   
   const { data: repaymentAmountData } = useReadContract({
-    address: myLoanContract.address,
-    abi: myLoanContract.abi,
+    address:LoanContractAddress,
+    abi: LoanContractABI,
     functionName: 'repaymentAmount',
   })
   
   const { data: balanceData } = useReadContract({
-    address: myLoanContract.address,
-    abi: myLoanContract.abi,
+    address:LoanContractAddress,
+    abi: LoanContractABI,
     functionName: 'getBalance',
   })
   
@@ -74,8 +74,8 @@ export default function InvestorDashboard() {
     try {
       setError("")
       writeContract({
-        address: myLoanContract.address,
-        abi: myLoanContract.abi,
+        address:LoanContractAddress,
+        abi: LoanContractABI,
         functionName: 'investLoan',
         value: ethers.parseUnits(investAmount, 18)
       })

@@ -23,7 +23,7 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Check, AlertTriangle } from "lucide-react"
 import { ethers } from "ethers"
-import { myLoanContract } from "@/contractsAbi/LoanContractABI"
+import { LoanContractAddress, LoanContractABI } from "@/contractsAbi/LoanContractABI"
 import { 
   useAccount,
   useReadContract,
@@ -63,20 +63,20 @@ export default function OperatorDashboard() {
 
   // Get loan data from contract
   const { data: borrowerData } = useReadContract({
-    address: myLoanContract.address,
-    abi: myLoanContract.abi,
+    address:LoanContractAddress,
+    abi: LoanContractABI,
     functionName: 'borrower',
   })
   
   const { data: repaymentAmountData } = useReadContract({
-    address: myLoanContract.address,
-    abi: myLoanContract.abi,
+    address:LoanContractAddress,
+    abi: LoanContractABI,
     functionName: 'repaymentAmount',
   })
   
   const { data: balanceData } = useReadContract({
-    address: myLoanContract.address,
-    abi: myLoanContract.abi,
+    address:LoanContractAddress,
+    abi: LoanContractABI,
     functionName: 'getBalance',
   })
   
@@ -102,8 +102,8 @@ export default function OperatorDashboard() {
     try {
       setError("")
       writeContract({
-        address: myLoanContract.address,
-        abi: myLoanContract.abi,
+        address:LoanContractAddress,
+        abi: LoanContractABI,
         functionName: 'repayLoan',
         value: ethers.parseUnits(repayAmount, 18)
       })
@@ -121,8 +121,8 @@ export default function OperatorDashboard() {
     try {
       setError("")
       writeContract({
-        address: myLoanContract.address,
-        abi: myLoanContract.abi,
+        address:LoanContractAddress,
+        abi: LoanContractABI,
         functionName: 'withdrawLoan',
       })
     } catch (err: any) {

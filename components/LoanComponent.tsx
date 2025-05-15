@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { Check, AlertTriangle } from "lucide-react"
 import { ethers } from "ethers"
-import { myLoanContract } from "@/contractsAbi/LoanContractABI"
+import { LoanContractABI ,LoanContractAddress} from "@/contractsAbi/LoanContractABI"
 import { 
   useAccount,
   useReadContract,
@@ -36,32 +36,32 @@ export default function LoanComponent() {
 
   // Get loan data from contract
   const { data: borrowerData } = useReadContract({
-    address: myLoanContract.address,
-    abi: myLoanContract,
+    address: LoanContractAddress,
+    abi: LoanContractABI,
     functionName: 'borrower',
   })
   
   const { data: amountBorrowedData } = useReadContract({
-    address: myLoanContract.address,
-    abi: myLoanContract.abi,
+    address: LoanContractAddress,
+    abi: LoanContractABI,
     functionName: 'amountBorrowed',
   })
   
   const { data: repaymentAmountData } = useReadContract({
-    address: myLoanContract.address,
-    abi: myLoanContract.abi,
+    address: LoanContractAddress,
+    abi: LoanContractABI,
     functionName: 'repaymentAmount',
   })
   
   const { data: balanceData } = useReadContract({
-    address: myLoanContract.address,
-    abi: myLoanContract.abi,
+    address: LoanContractAddress,
+    abi: LoanContractABI,
     functionName: 'getBalance',
   })
   
   const { data: investorsData } = useReadContract({
-    address: myLoanContract.address,
-    abi: myLoanContract.abi,
+    address: LoanContractAddress,
+    abi: LoanContractABI,
     functionName: 'getInvestors',
   })
   
@@ -92,8 +92,8 @@ export default function LoanComponent() {
     try {
       setError("")
       writeContract({
-        address: myLoanContract.address,
-        abi: myLoanContract.abi,
+        address: LoanContractAddress,
+        abi: LoanContractABI,
         functionName: 'investLoan',
         value: ethers.parseUnits(investAmount, 18)
       })
@@ -116,8 +116,8 @@ export default function LoanComponent() {
     try {
       setError("")
       writeContract({
-        address: myLoanContract.address,
-        abi: myLoanContract.abi,
+        address: LoanContractAddress,
+        abi: LoanContractABI,
         functionName: 'repayLoan',
         value: ethers.parseUnits(repayAmount, 18)
       })
@@ -135,8 +135,8 @@ export default function LoanComponent() {
     try {
       setError("")
       writeContract({
-        address: myLoanContract.address,
-        abi: myLoanContract.abi,
+        address: LoanContractAddress,
+        abi: LoanContractABI,
         functionName: 'withdrawLoan',
       })
     } catch (err: any) {

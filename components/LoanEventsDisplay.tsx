@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useWatchContractEvent } from "wagmi";
+import { useState, useEffect } from "react";
+import { usePublicClient } from "wagmi";
 import { loanFactoryABI, loanFactoryAddress } from "@/contractsAbi/LoanFactory";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatEther } from "viem";
@@ -7,40 +7,64 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { InfoIcon, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-interface LoanEvent {
-  loanAddress: string;
-  borrower: string;
-  amount: bigint;
-  time: bigint;
-  logId: string; 
-}
-
-export function LoanEventsDisplay({ onNewLoanAddress }: { onNewLoanAddress?: (address: string) => void }) {
-  const [events, setEvents] = useState<LoanEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const manualRefresh = () => {
-    setIsLoading(true);
-    // This is just visual feedback since useWatchContractEvent doesn't have a manual refresh
-    // We'll hide the loading indicator after a short delay
-    setTimeout(() => setIsLoading(false), 1000);
-  };
-
-  useWatchContractEvent({
-    address: loanFactoryAddress as `0x${string}`,
-    abi: loanFactoryABI,
-    eventName: "LoanCreated",
-    pollingInterval: 5000,
-    onLogs(logs) {
-      console.log("New logs:", logs);
-      const newEvents = logs.map(log => ({
-        loanAddress: log.args.loanAddress as string,
-        borrower: log.args.borrower as string,
-        amount: log.args.amount as bigint,
-        time: log.args.time as bigint,
-        logId: `${log.blockHash}-${log.logIndex}` // Unique ID for key
-      }));
+/**
+ * Component to display loan creation events from the LoanFactory contract
+ * Uses a more stable approach than event filters which were failing
+ */
+export function LoanEventsDisplay({ onNewLoanAddress }) {
+  const [events, setEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const publicClient = usePublicClient();
+  
+  // Function to fetch events manually instead of using filters which were failing
+  const fetchLoanEvents = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Get the current block number
+      const blockNumber = await publicClient.getBlockNumber();
+      
+      // Fetch events from the last 1000 blocks or a reasonable number
+      // Adjust this value based on your chain's block time and expected event frequency
+      const fromBlock = blockNumber - 1000n > 0n ? blockNumber - 1000n : 0n;
+      
+      const logs = await publicClient.getLogs({
+        address: loanFactoryAddress,
+        event: {
+          type: 'event',
+          name: 'LoanCreated',
+          inputs: [
+            { type: 'address', name: 'loanAddress', indexed: true },
+            { type: 'address', name: 'borrower', indexed: true },
+            { type: 'uint256', name: 'amount' },
+            { type: 'uint256', name: 'time' }
+          ]
+        },
+        fromBlock,
+        toBlock: blockNumber
+      });
+      
+      console.log("Fetched logs:", logs);
+      
+      // Process the events
+      const newEvents = logs.map(log => {
+        const { args } = publicClient.decodeEventLog({
+          abi: loanFactoryABI,
+          data: log.data,
+          topics: log.topics,
+          eventName: 'LoanCreated'
+        });
+        
+        return {
+          loanAddress: args.loanAddress,
+          borrower: args.borrower,
+          amount: args.amount,
+          time: args.time,
+          logId: `${log.blockHash}-${log.logIndex}`
+        };
+      });
       
       // Update events and sort from newest to oldest
       setEvents(prevEvents => {
@@ -59,13 +83,31 @@ export function LoanEventsDisplay({ onNewLoanAddress }: { onNewLoanAddress?: (ad
       if (onNewLoanAddress && newEvents.length > 0) {
         onNewLoanAddress(newEvents[0].loanAddress);
       }
-    },
-    onError(error) {
-      console.error("Error watching LoanCreated event:", error);
-      setError("Failed to watch for loan events. Please refresh or try again later.");
+    } catch (err) {
+      console.error("Error fetching loan events:", err);
+      setError("Failed to fetch loan events. Please refresh or try again later.");
+    } finally {
+      setIsLoading(false);
     }
-  });
-
+  };
+  
+  // Set up polling to fetch events regularly instead of using filters
+  useEffect(() => {
+    // Fetch events immediately when component mounts
+    fetchLoanEvents();
+    
+    // Then set up a polling interval to fetch regularly
+    const interval = setInterval(fetchLoanEvents, 15000); // Poll every 15 seconds
+    
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(interval);
+  }, [publicClient]); // Re-initialize if the client changes
+  
+  // Handle manual refresh
+  const handleRefresh = () => {
+    fetchLoanEvents();
+  };
+  
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -76,7 +118,7 @@ export function LoanEventsDisplay({ onNewLoanAddress }: { onNewLoanAddress?: (ad
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={manualRefresh} 
+          onClick={handleRefresh} 
           disabled={isLoading}
           className="flex items-center gap-1"
         >
