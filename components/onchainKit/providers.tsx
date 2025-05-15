@@ -2,14 +2,15 @@
 
 import { ReactNode } from 'react';
 import { OnchainKitProvider } from '@coinbase/onchainkit';
-import { baseSepolia } from 'wagmi/chains';
-import yieldguruLogo from '../../public/images/YG LOGO.png';
+
+import { sepolia } from 'wagmi/chains';
+import yieldguruLogo from '../../public/images/logo.jpeg';
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <OnchainKitProvider
       apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY || ""}
-      chain={baseSepolia}
+      chain={sepolia}
       config={{
         appearance: {
           name: 'YieldGuru', // project name
