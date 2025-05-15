@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 interface LoginFormProps {
   dashboardType: string
@@ -22,11 +23,17 @@ export default function LoginForm({ dashboardType, accentColor, passwordRequirem
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
   const router = useRouter()
 
   const validatePassword = (password: string): boolean => {
+    // For generalized login, use a basic validation
+    if (dashboardType === "general") {
+      // Basic validation: at least 8 characters
+      return password.length >= 8
+    }
     // Different validation based on dashboard type
-    if (dashboardType === "admin") {
+    else if (dashboardType === "admin") {
       // Admin: uppercase, number, special char
       return /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/.test(password)
     } else if (dashboardType === "investor") {
@@ -38,27 +45,86 @@ export default function LoginForm({ dashboardType, accentColor, passwordRequirem
     }
   }
 
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    // Reset error
+    setError("")
+
     if (!validatePassword(password)) {
-      alert("Password does not meet the requirements")
+      setError(`Password does not meet requirements: ${passwordRequirements}`)
       return
     }
 
     setIsLoading(true)
 
-    // Simulate authentication
-    setTimeout(() => {
+    try {
+      let endpoint = '/api/auth/login';
+
+      // For admin login, use the admin endpoint
+      if (dashboardType === "admin") {
+        endpoint = '/api/auth/admin';
+      }
+
+      // For generalized login, try the regular login endpoint first
+      // The server will determine the user's role
+
+      // Call the login API
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      })
+
+      const data = await response.json()
+
+      console.log('Login response:', response.status, data)
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed')
+      }
+
+      // Check if auth_token cookie was set
+      console.log('Cookies after login:', document.cookie)
+
+      // Determine the dashboard type from the user's role
+      let redirectDashboard = dashboardType;
+
+      if (dashboardType === "general" && data.user && data.user.role) {
+        // Map the role to the dashboard type
+        const roleMap: Record<string, string> = {
+          'Admin': 'admin',
+          'Investor': 'investor',
+          'Operator': 'operator'
+        };
+
+        redirectDashboard = roleMap[data.user.role] || 'investor';
+      }
+
+      // Redirect to the appropriate dashboard
+      router.push(`/dashboard/${redirectDashboard}`)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred')
+    } finally {
       setIsLoading(false)
-      // Use direct route to ensure we're going to the right place
-      router.push(`/dashboard/${dashboardType}`)
-    }, 1500)
+    }
   }
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
       <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+          <Alert variant="destructive">
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input

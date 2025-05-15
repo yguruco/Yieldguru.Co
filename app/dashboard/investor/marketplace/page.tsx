@@ -199,13 +199,18 @@ export default function MarketplacePage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <motion.div
+      className="space-y-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div variants={itemVariants} className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Marketplace</h1>
           <p className="text-muted-foreground">Browse and invest in tokenized EV loans</p>
         </div>
-      </div>
+      </motion.div>
 
       <Card>
         <CardHeader>

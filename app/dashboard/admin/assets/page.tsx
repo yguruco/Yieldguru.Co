@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { motion } from "framer-motion"
+import GlassmorphicCard from "@/components/dashboard/glassmorphic-card"
+import NeumorphicStatCard from "@/components/dashboard/neumorphic-stat-card"
 
 interface Loan {
   id: string

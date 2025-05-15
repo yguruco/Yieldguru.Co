@@ -91,13 +91,43 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-[#4f1964] text-foreground;
   }
 }
 
 @layer utilities {
   .animate-fade-in-up {
     animation: fadeInUp 0.8s ease-out forwards;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+
+  .animate-scroll-text {
+    animation: scrollText 15s linear infinite;
+  }
+
+  /* Parallax effect for blog and testimonial sections */
+  .has-parallax-sections {
+    overflow-x: hidden;
+    height: 100%;
+  }
+
+  /* Blog section with fixed position effect */
+  #blog {
+    position: relative;
+    z-index: 1;
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* Testimonial section that slides over blog */
+  section[class*="bg-[#4f1964]"] {
+    position: relative;
+    z-index: 10;
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   .animation-delay-100 {
@@ -108,6 +138,14 @@
     animation-delay: 0.2s;
   }
 
+  .animation-delay-300 {
+    animation-delay: 0.3s;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 0.4s;
+  }
+
   @keyframes fadeInUp {
     from {
       opacity: 0;
@@ -116,6 +154,169 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes scrollText {
+    0% {
+      transform: translateY(0);
+    }
+    15% {
+      transform: translateY(0);
+    }
+    20% {
+      transform: translateY(-30px);
+    }
+    35% {
+      transform: translateY(-30px);
+    }
+    40% {
+      transform: translateY(-60px);
+    }
+    55% {
+      transform: translateY(-60px);
+    }
+    60% {
+      transform: translateY(-90px);
+    }
+    75% {
+      transform: translateY(-90px);
+    }
+    80% {
+      transform: translateY(-120px);
+    }
+    95% {
+      transform: translateY(-120px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  .floating-dot-1 {
+    animation: floatingDot 3s ease-in-out infinite;
+  }
+
+  .floating-dot-2 {
+    animation: floatingDot 4s ease-in-out 0.5s infinite;
+  }
+
+  .floating-dot-3 {
+    animation: floatingDot 5s ease-in-out 1s infinite;
+  }
+
+  .floating-dot-4 {
+    animation: floatingDot 4.5s ease-in-out 1.5s infinite;
+  }
+
+  .floating-dot-5 {
+    animation: floatingDot 3.5s ease-in-out 2s infinite;
+  }
+
+  @keyframes floatingDot {
+    0%, 100% {
+      transform: translateY(0) translateX(0);
+    }
+    50% {
+      transform: translateY(-10px) translateX(5px);
+    }
+  }
+
+  .scroll-in-view {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  }
+
+  .scroll-in-view.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* FAQ section animations */
+  .faq-highlight {
+    position: relative;
+  }
+
+  .faq-highlight::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #4f1964;
+    transition: width 0.3s ease;
+  }
+
+  .faq-highlight:hover::after {
+    width: 100%;
+  }
+
+  .faq-card-glow {
+    position: relative;
+  }
+
+  .faq-card-glow::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    background: linear-gradient(45deg, #4f1964, transparent, #fbdc3e);
+    border-radius: inherit;
+    z-index: -1;
+    animation: glowingBorder 3s linear infinite;
+  }
+
+  @keyframes glowingBorder {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* Shimmer effect */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      transparent 100%
+    );
+    transform: rotate(30deg);
+    animation: shimmerEffect 3s infinite;
+  }
+
+  @keyframes shimmerEffect {
+    0% {
+      transform: translateX(-100%) rotate(30deg);
+    }
+    100% {
+      transform: translateX(100%) rotate(30deg);
     }
   }
 }

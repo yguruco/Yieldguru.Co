@@ -4,6 +4,32 @@ import { ArrowUpRight } from "lucide-react"
 import Link from "next/link"
 
 export default function AdminDashboardPage() {
+  const [activeTab, setActiveTab] = useState("overview")
+  const accentColor = "#4f1964"
+
+  // Animation variants for tab transitions
+  const tabVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        staggerChildren: 0.1
+      }
+    },
+    exit: {
+      opacity: 0,
+      y: -20,
+      transition: { duration: 0.3 }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  }
+
   return (
     <div className="space-y-6">
       <div>

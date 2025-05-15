@@ -58,17 +58,33 @@ export default function InvestorPortfolioPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <motion.div
+      className="space-y-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div variants={itemVariants} className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">My Portfolio</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl"
+              style={{
+                background: `linear-gradient(135deg, ${accentColor}, ${accentColor}80)`,
+                boxShadow: `0 3px 10px ${accentColor}40`
+              }}
+            >
+              <Wallet className="h-5 w-5 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight shimmer">My Portfolio</h1>
+          </div>
           <p className="text-muted-foreground">Track and manage your EV asset investments</p>
         </div>
         <Button className="bg-[#fbdc3e] text-[#4f1964] hover:bg-[#fbdc3e]/90">
           <PieChart className="mr-2 h-4 w-4" />
           Portfolio Analysis
         </Button>
-      </div>
+      </motion.div>
 
       <div className="grid gap-6 md:grid-cols-4">
         <Card>
@@ -110,33 +126,37 @@ export default function InvestorPortfolioPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Portfolio Allocation</CardTitle>
-            <CardDescription>Distribution by asset type</CardDescription>
-          </CardHeader>
-          <CardContent className="flex h-80 items-center justify-center">
-            <div className="flex h-64 w-64 flex-col items-center justify-center rounded-full border-8 border-[#fbdc3e] text-center">
-              <LineChart className="mb-2 h-8 w-8 text-[#4f1964]" />
-              <div className="text-2xl font-bold">Asset Allocation</div>
-              <div className="text-sm text-muted-foreground">Interactive chart in production</div>
-            </div>
-          </CardContent>
-        </Card>
+        <motion.div variants={itemVariants}>
+          <GlassmorphicCard
+            title="Portfolio Allocation"
+            description="Distribution by asset type"
+            accentColor={accentColor}
+          >
+            <ChartPlaceholder
+              height={300}
+              type="pie"
+              title="Asset Allocation"
+              description="Breakdown by vehicle type"
+              accentColor={accentColor}
+            />
+          </GlassmorphicCard>
+        </motion.div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Performance History</CardTitle>
-            <CardDescription>Monthly returns over time</CardDescription>
-          </CardHeader>
-          <CardContent className="flex h-80 items-center justify-center">
-            <div className="flex h-64 w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 text-center">
-              <BarChart className="mb-2 h-8 w-8 text-[#4f1964]" />
-              <div className="text-2xl font-bold">Performance Chart</div>
-              <div className="text-sm text-muted-foreground">Interactive chart in production</div>
-            </div>
-          </CardContent>
-        </Card>
+        <motion.div variants={itemVariants}>
+          <GlassmorphicCard
+            title="Performance History"
+            description="Monthly returns over time"
+            accentColor={accentColor}
+          >
+            <ChartPlaceholder
+              height={300}
+              type="bar"
+              title="Performance Chart"
+              description="Monthly returns"
+              accentColor={accentColor}
+            />
+          </GlassmorphicCard>
+        </motion.div>
       </div>
 
       <Card>

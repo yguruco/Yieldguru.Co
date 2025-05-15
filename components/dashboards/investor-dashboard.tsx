@@ -240,20 +240,43 @@ interface OpportunityCardProps {
   yield: string
   minInvestment: string
   available: string
+  index?: number
+  accentColor?: string
 }
 
-function OpportunityCard({ title, yield: yieldValue, minInvestment, available }: OpportunityCardProps) {
+function OpportunityCard({ title, yield: yieldValue, minInvestment, available, index = 0, accentColor = "#fbdc3e" }: OpportunityCardProps) {
   return (
-    <div className="flex items-center justify-between rounded-lg border p-4">
-      <div>
-        <h3 className="font-medium">{title}</h3>
-        <div className="mt-1 flex items-center gap-4 text-sm text-muted-foreground">
-          <span>Yield: {yieldValue}</span>
-          <span>Min: {minInvestment}</span>
-          <span>Available: {available}</span>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: 0.05 * index }}
+      whileHover={{ y: -3, transition: { duration: 0.2 } }}
+      className="group"
+    >
+      <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-md">
+        <div>
+          <div className="flex items-center gap-2">
+            <div
+              className="flex h-8 w-8 items-center justify-center rounded-full"
+              style={{ backgroundColor: `${accentColor}15` }}
+            >
+              <CreditCard className="h-4 w-4" style={{ color: accentColor }} />
+            </div>
+            <h3 className="font-medium">{title}</h3>
+          </div>
+          <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
+            <span>Yield: {yieldValue}</span>
+            <span>Min: {minInvestment}</span>
+            <span>Available: {available}</span>
+          </div>
         </div>
+        <Button
+          className="transition-transform duration-300 group-hover:scale-105"
+          style={{ backgroundColor: accentColor, color: "#4f1964" }}
+        >
+          Invest
+        </Button>
       </div>
-      <Button style={{ backgroundColor: "#fbdc3e", color: "#4f1964" }}>Invest</Button>
-    </div>
+    </motion.div>
   )
 }
