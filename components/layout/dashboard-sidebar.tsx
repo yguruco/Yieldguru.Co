@@ -160,9 +160,9 @@ export function DashboardSidebar({ isOpen, dashboardType, accentColor }: Dashboa
                         <span>Contact Us</span>
                       </Link>
                     </li>
-                  )
-                })}
-              </ul>
+                  </ul>
+                </div>
+              </div>
               
               {/* Wallet at the bottom of the sidebar */}
               <div className="mt-auto pt-6 border-t border-gray-200 mt-6">
@@ -316,9 +316,9 @@ export function DashboardSidebar({ isOpen, dashboardType, accentColor }: Dashboa
                         <span>Contact Us</span>
                       </Link>
                     </li>
-                  )
-                })}
-              </ul>
+                  </ul>
+                </div>
+              </div>
               
               {/* Wallet at the bottom of the mobile sidebar */}
               <div className="mt-auto pt-6 border-t border-gray-200 mt-6">

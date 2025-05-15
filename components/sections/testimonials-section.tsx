@@ -115,6 +115,9 @@ const testimonials = [
       "Getting our electric buses funded used to take months. With YieldGuru, we closed our last round in under two weeks. It's a game-changer for transit expansion.",
     author: "Sarah Johnson",
     title: "Fleet Manager at MetroTransit",
+  },
+  {
+    quote:
       "With YieldGuru we have been able to enter into a financing partnership to increase our electric vans fleet from 2 to 50 vans plying the Ruiru - Ruaka - Westlands routes, and more routes are opening up",
     author: "Sam Kamau",
     title: "CEO - Sony Classic Shuttles",
@@ -129,9 +132,13 @@ const testimonials = [
     quote:
       "We've been tracking EV asset trends across Africa, and YieldGuru has one of the most actionable models for deploying capital transparently.",
     author: "Kelvin Johnsone",
+    title: "Research & Strategy at Africa Insights",
+  },
+  {
+    quote:
       "We are working with YieldGuru to launch the first National EV Buses Sacco in Kenya. We will enable our members transition 100% to electric buses, with cheaper financing alternatives",
     author: "Bernard Odero",
-    title: "Research & Strategy at Africa Insights",
+    title: "Chairman - Kenya Bus Operators Association",
   },
   {
     quote:

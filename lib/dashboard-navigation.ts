@@ -1,4 +1,4 @@
-import { BarChart, BookOpen, Car, Home, LineChart, Shield, Truck, Users, Wallet, Droplets, UserCircle } from "lucide-react"
+import { BarChart, BookOpen, Home, LineChart, RefreshCw, Shield, Wallet, Droplets, UserCircle } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 interface NavItem {
