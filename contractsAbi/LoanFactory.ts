@@ -98,5 +98,5 @@ export const loanFactoryABI =  [
         }
     ] as const ;
   
-    export const loanFactoryAddress = "0x74845b53f1807F6547aEB4c85daE2516cbBcF80b" ;
+    export const loanFactoryAddress = "0x5D9b64D81E704587B9f9465B010276A3441E0183" ;
   

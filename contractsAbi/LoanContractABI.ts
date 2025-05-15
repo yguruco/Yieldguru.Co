@@ -1,6 +1,4 @@
-export const myLoanContract = {
-  loanFactoryAddress: "0xFD2CbCBCC2dC05E4FBd74fFdCe649a301918EEEC" as const,
-  loanFactoryABI: [
+export const LoanContractABI =  [
         {
           "inputs": [
             {
@@ -240,6 +238,5 @@ export const myLoanContract = {
           "stateMutability": "nonpayable",
           "type": "function"
         }
-      ] as const
-  };
+      ] as const;
   

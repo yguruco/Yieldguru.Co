@@ -4,48 +4,27 @@ import { motion, AnimatePresence } from "framer-motion"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Wallet, BarChart3, TrendingUp, Percent, CreditCard } from "lucide-react"
-import GlassmorphicCard from "@/components/dashboard/glassmorphic-card"
-import NeumorphicStatCard from "@/components/dashboard/neumorphic-stat-card"
-import { ChartPlaceholder } from "@/components/dashboard/chart-placeholder"
+import { ArrowUpRight } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Progress } from "@/components/ui/progress"
+import { Check, AlertTriangle } from "lucide-react"
+import ViewInvest from "@/app/dashboard/investCard/viewinvest"
+import { 
+  useAccount,
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt
+} from 'wagmi'
+import { formatEther, parseEther } from 'viem'
+import { LoanContractABI } from "@/contractsAbi/LoanContractABI"
 
-const portfolioData = [
-  { month: "Jan", value: 10000 },
-  { month: "Feb", value: 12000 },
-  { month: "Mar", value: 11500 },
-  { month: "Apr", value: 13500 },
-  { month: "May", value: 14800 },
-  { month: "Jun", value: 16200 },
-]
-
-const yieldData = [
-  { month: "Jan", value: 4.2 },
-  { month: "Feb", value: 4.3 },
-  { month: "Mar", value: 4.1 },
-  { month: "Apr", value: 4.5 },
-  { month: "May", value: 4.7 },
-  { month: "Jun", value: 4.9 },
-]
+// Sample contract address for demonstration
+const LoanContractAddress = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199" as `0x${string}`
 
 export default function InvestorDashboard() {
-  const accentColor = "#fbdc3e";
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-  };
-
+  
   return (
     <motion.div
       className="space-y-6"
@@ -100,101 +79,27 @@ export default function InvestorDashboard() {
         </motion.div>
       </div>
 
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
-        <motion.div variants={itemVariants} className="lg:col-span-2">
-          <GlassmorphicCard
-            title="Portfolio Performance"
-            description="Your investment growth over time"
-            accentColor={accentColor}
-          >
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={portfolioData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`$${value}`, "Value"]} />
-                  <Area type="monotone" dataKey="value" stroke={accentColor} fill={accentColor} fillOpacity={0.3} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </GlassmorphicCard>
-        </motion.div>
+      {/* Investment Component using ViewInvest */}
+      <ViewInvest />
 
-        <motion.div variants={itemVariants}>
-          <GlassmorphicCard
-            title="Investment Opportunities"
-            description="New tokenized assets available for investment"
-            accentColor={accentColor}
-          >
-            <div className="space-y-4 py-2">
-              <OpportunityCard
-                title="Electric Bus Fleet"
-                yield="5.2%"
-                minInvestment="$1,000"
-                available="$245,000"
-                index={0}
-                accentColor={accentColor}
-              />
-              <OpportunityCard
-                title="Taxi EV Network"
-                yield="4.8%"
-                minInvestment="$500"
-                available="$120,000"
-                index={1}
-                accentColor={accentColor}
-              />
-              <OpportunityCard
-                title="Delivery Vans"
-                yield="5.5%"
-                minInvestment="$2,000"
-                available="$380,000"
-                index={2}
-                accentColor={accentColor}
-              />
-            </div>
-          </GlassmorphicCard>
-        </motion.div>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <motion.div variants={itemVariants}>
-          <GlassmorphicCard
-            title="Yield Trends"
-            description="Monthly yield percentage"
-            accentColor={accentColor}
-          >
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={yieldData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`${value}%`, "Yield"]} />
-                  <Line type="monotone" dataKey="value" stroke="#f68b27" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </GlassmorphicCard>
-        </motion.div>
-
-        <motion.div variants={itemVariants}>
-          <GlassmorphicCard
-            title="Asset Distribution"
-            description="Breakdown of your investment portfolio"
-            accentColor={accentColor}
-          >
-            <ChartPlaceholder
-              height="h-80"
-              type="pie"
-              title="Asset Distribution"
-              description="Breakdown by vehicle type"
-              accentColor={accentColor}
-            />
-          </GlassmorphicCard>
-        </motion.div>
-      </div>
-    </motion.div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            Investment Opportunities
+            <Button style={{ backgroundColor: "#fbdc3e", color: "#4f1964" }} size="sm">
+              View All <ArrowUpRight className="ml-1 h-4 w-4" />
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <OpportunityCard title="Electric Bus Fleet" yield="5.2%" minInvestment="$1,000" available="$245,000" />
+            <OpportunityCard title="Taxi EV Network" yield="4.8%" minInvestment="$500" available="$120,000" />
+            <OpportunityCard title="Delivery Vans" yield="5.5%" minInvestment="$2,000" available="$380,000" />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 
