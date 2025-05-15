@@ -1,6 +1,6 @@
 export const myLoanContract = {
-    address: "0xFD2CbCBCC2dC05E4FBd74fFdCe649a301918EEEC" as const,
-    abi: [
+  loanFactoryAddress: "0xFD2CbCBCC2dC05E4FBd74fFdCe649a301918EEEC" as const,
+  loanFactoryABI: [
         {
           "inputs": [
             {
