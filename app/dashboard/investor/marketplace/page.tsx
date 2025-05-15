@@ -7,154 +7,196 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { motion } from "framer-motion"
+import { Search, Percent, InfoIcon, Clock } from "lucide-react"
 import Image from "next/image"
-import LiquidityPoolInterface from "@/components/liquidity-pool-interface"
-import { motion, AnimatePresence } from "framer-motion"
-import { Search, Filter, Tag, Percent, DollarSign, MapPin, Building } from "lucide-react"
-import GlassmorphicCard from "@/components/dashboard/glassmorphic-card"
-import NeumorphicStatCard from "@/components/dashboard/neumorphic-stat-card"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
-interface MarketplaceAsset {
+interface Loan {
   id: string
   name: string
-  image: string
+  image: string | null
   operator: string
-  value: number
+  borrower: string
+  adminAddress: string
+  amount: number
+  repaymentAmount: number
+  monthlyInterest?: number
+  duration: number
+  createdAt: string
+  status: string
+  transactionHash?: string
+}
+
+interface MarketplaceLoan extends Loan {
   yield: number
   available: number
   minInvestment: number
-  type: string
-  location: string
-  listingDate: string
+  invested?: number
 }
 
 export default function MarketplacePage() {
-  const [assets, setAssets] = useState<MarketplaceAsset[]>([])
-  const [filteredAssets, setFilteredAssets] = useState<MarketplaceAsset[]>([])
+  const [loans, setLoans] = useState<MarketplaceLoan[]>([])
+  const [filteredLoans, setFilteredLoans] = useState<MarketplaceLoan[]>([])
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedType, setSelectedType] = useState("All")
   const [selectedYield, setSelectedYield] = useState("All")
   const [selectedValue, setSelectedValue] = useState("All")
+  const [selectedStatus, setSelectedStatus] = useState("All")
+  const [selectedInvestment, setSelectedInvestment] = useState<string | null>(null)
+  const [investmentAmount, setInvestmentAmount] = useState("")
+  const [isInvesting, setIsInvesting] = useState(false)
+  const [investmentProgress, setInvestmentProgress] = useState(0)
 
   useEffect(() => {
-    // Load assets from localStorage or use default data
-    const storedAssets = localStorage.getItem("marketplaceAssets")
-
-    if (storedAssets) {
-      const parsedAssets = JSON.parse(storedAssets)
-      setAssets(parsedAssets)
-      setFilteredAssets(parsedAssets)
+    // Load admin-created loans from localStorage
+    const adminLoans = JSON.parse(localStorage.getItem("adminLoans") || "[]");
+    
+    // Transform admin loans into marketplace loans
+    const marketplaceLoans = adminLoans.map((loan: Loan) => {
+      // Calculate the annual yield (simple calculation based on monthly interest)
+      const yearlyYield = loan.monthlyInterest 
+        ? loan.monthlyInterest * 12
+        : (((loan.repaymentAmount / loan.amount) - 1) * 100) / (loan.duration / 12);
+        
+      // Randomize the available amount (70-95% of total)
+      const availablePercentage = Math.random() * 25 + 70;
+      const available = Math.round(loan.amount * (availablePercentage / 100));
+      
+      // Set minimum investment at 1-5% of the loan amount
+      const minPercentage = Math.random() * 4 + 1;
+      const minInvestment = Math.round(loan.amount * (minPercentage / 100));
+      
+      return {
+        ...loan,
+        yield: parseFloat(yearlyYield.toFixed(2)),
+        available: available,
+        minInvestment: minInvestment,
+      };
+    });
+    
+    if (marketplaceLoans.length > 0) {
+      setLoans(marketplaceLoans);
+      setFilteredLoans(marketplaceLoans);
     } else {
-      // Default assets if none in localStorage
-      const defaultAssets: MarketplaceAsset[] = [
-        {
-          id: "asset1",
-          name: "Electric Bus Fleet - Metro Line 7",
-          image: "/images/electric-bus.jpeg",
-          operator: "Metro Transit Authority",
-          value: 1250000,
-          yield: 5.2,
-          available: 875000,
-          minInvestment: 10000,
-          type: "Bus",
-          location: "Downtown Metro Area",
-          listingDate: "2023-05-15",
-        },
-        {
-          id: "asset2",
-          name: "Delivery Van Network - East Region",
-          image: "/images/ford-vehicle.jpeg",
-          operator: "EcoDelivery Services",
-          value: 750000,
-          yield: 4.8,
-          available: 450000,
-          minInvestment: 5000,
-          type: "Van",
-          location: "Eastern Commercial District",
-          listingDate: "2023-06-22",
-        },
-        {
-          id: "asset3",
-          name: "Electric Taxi Fleet - Airport Service",
-          image: "/images/ford.jpeg",
-          operator: "GreenRide Taxi Co.",
-          value: 950000,
-          yield: 6.1,
-          available: 650000,
-          minInvestment: 7500,
-          type: "Taxi",
-          location: "International Airport Zone",
-          listingDate: "2023-04-10",
-        },
-      ]
-
-      setAssets(defaultAssets)
-      setFilteredAssets(defaultAssets)
-      localStorage.setItem("marketplaceAssets", JSON.stringify(defaultAssets))
+      // Use default loans if no admin loans are found
+      const defaultMarketplaceLoans = convertDefaultLoansToMarketplace(defaultLoans);
+      setLoans(defaultMarketplaceLoans);
+      setFilteredLoans(defaultMarketplaceLoans);
+      localStorage.setItem("marketplaceLoans", JSON.stringify(defaultMarketplaceLoans));
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    // Filter assets based on search term and filters
-    let result = [...assets]
+    // Filter loans based on search term and filters
+    let result = [...loans]
 
     // Apply search filter
     if (searchTerm) {
       result = result.filter(
-        (asset) =>
-          asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          asset.operator.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          asset.location.toLowerCase().includes(searchTerm.toLowerCase()),
+        (loan) =>
+          loan.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          loan.operator.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          loan.id.toLowerCase().includes(searchTerm.toLowerCase()),
       )
-    }
-
-    // Apply type filter
-    if (selectedType !== "All") {
-      result = result.filter((asset) => asset.type === selectedType)
     }
 
     // Apply yield filter
     if (selectedYield !== "All") {
       if (selectedYield === "Under 5%") {
-        result = result.filter((asset) => asset.yield < 5)
-      } else if (selectedYield === "5-6%") {
-        result = result.filter((asset) => asset.yield >= 5 && asset.yield <= 6)
-      } else if (selectedYield === "Over 6%") {
-        result = result.filter((asset) => asset.yield > 6)
+        result = result.filter((loan) => loan.yield < 5)
+      } else if (selectedYield === "5-10%") {
+        result = result.filter((loan) => loan.yield >= 5 && loan.yield <= 10)
+      } else if (selectedYield === "Over 10%") {
+        result = result.filter((loan) => loan.yield > 10)
       }
     }
 
     // Apply value filter
     if (selectedValue !== "All") {
-      if (selectedValue === "Under $500K") {
-        result = result.filter((asset) => asset.value < 500000)
-      } else if (selectedValue === "$500K-$1M") {
-        result = result.filter((asset) => asset.value >= 500000 && asset.value <= 1000000)
-      } else if (selectedValue === "Over $1M") {
-        result = result.filter((asset) => asset.value > 1000000)
+      if (selectedValue === "Under $100K") {
+        result = result.filter((loan) => loan.amount < 100000)
+      } else if (selectedValue === "$100K-$500K") {
+        result = result.filter((loan) => loan.amount >= 100000 && loan.amount <= 500000)
+      } else if (selectedValue === "Over $500K") {
+        result = result.filter((loan) => loan.amount > 500000)
       }
     }
-
-    setFilteredAssets(result)
-  }, [assets, searchTerm, selectedType, selectedYield, selectedValue])
-
-  const accentColor = "#fbdc3e";
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
+    
+    // Apply status filter
+    if (selectedStatus !== "All") {
+      result = result.filter((loan) => loan.status === selectedStatus)
     }
-  };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-  };
+    setFilteredLoans(result)
+  }, [loans, searchTerm, selectedYield, selectedValue, selectedStatus])
+
+  const handleInvest = (loanId: string) => {
+    setSelectedInvestment(loanId)
+    setInvestmentAmount("")
+  }
+  
+  const closeInvestmentModal = () => {
+    setSelectedInvestment(null)
+    setInvestmentAmount("")
+  }
+  
+  const handleSubmitInvestment = async () => {
+    if (!selectedInvestment || !investmentAmount) return;
+    
+    const amount = parseFloat(investmentAmount);
+    const loan = loans.find(l => l.id === selectedInvestment);
+    
+    if (!loan) return;
+    if (amount < loan.minInvestment) return;
+    if (amount > loan.available) return;
+    
+    setIsInvesting(true);
+    setInvestmentProgress(0);
+    
+    // Simulate investment process
+    for (let i = 1; i <= 5; i++) {
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setInvestmentProgress(i * 20);
+    }
+    
+    // Update loan available amount
+    const updatedLoans = loans.map(l => {
+      if (l.id === selectedInvestment) {
+        return {
+          ...l,
+          available: l.available - amount,
+          invested: (l.invested || 0) + amount
+        };
+      }
+      return l;
+    });
+    
+    setLoans(updatedLoans);
+    setFilteredLoans(updatedLoans);
+    
+    // Store updated portfolio in localStorage
+    const portfolioLoans = JSON.parse(localStorage.getItem("portfolioLoans") || "[]");
+    const existingLoanIndex = portfolioLoans.findIndex((p: any) => p.id === selectedInvestment);
+    
+    if (existingLoanIndex >= 0) {
+      portfolioLoans[existingLoanIndex].investedAmount += amount;
+    } else {
+      const investedLoan = {
+        ...loan,
+        investedAmount: amount,
+        investmentDate: new Date().toISOString(),
+      };
+      portfolioLoans.push(investedLoan);
+    }
+    
+    localStorage.setItem("portfolioLoans", JSON.stringify(portfolioLoans));
+    
+    // Reset form
+    setIsInvesting(false);
+    setSelectedInvestment(null);
+    setInvestmentAmount("");
+  }
 
   return (
     <motion.div
@@ -165,182 +207,300 @@ export default function MarketplacePage() {
     >
       <motion.div variants={itemVariants} className="flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-xl"
-              style={{
-                background: `linear-gradient(135deg, ${accentColor}, ${accentColor}80)`,
-                boxShadow: `0 3px 10px ${accentColor}40`
-              }}
-            >
-              <Building className="h-5 w-5 text-white" />
-            </div>
-            <h1 className="text-3xl font-bold tracking-tight shimmer">Marketplace</h1>
-          </div>
-          <p className="text-muted-foreground">Browse and invest in tokenized EV assets</p>
+          <h1 className="text-3xl font-bold tracking-tight">Marketplace</h1>
+          <p className="text-muted-foreground">Browse and invest in tokenized EV loans</p>
         </div>
       </motion.div>
 
-      <motion.div variants={itemVariants}>
-        <Tabs defaultValue="assets" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="assets">Assets</TabsTrigger>
-            <TabsTrigger value="liquidity">Liquidity Pool</TabsTrigger>
-          </TabsList>
+      <Card>
+        <CardHeader>
+          <CardTitle>Available Loans</CardTitle>
+          <CardDescription>Browse tokenized EV loans available for investment</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-6 space-y-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+                <Input
+                  placeholder="Search loans by name, operator, or ID..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <select
+                  className="h-10 rounded-md border border-input bg-background px-3 py-2"
+                  value={selectedYield}
+                  onChange={(e) => setSelectedYield(e.target.value)}
+                >
+                  <option value="All">All Yields</option>
+                  <option value="Under 5%">Under 5%</option>
+                  <option value="5-10%">5-10%</option>
+                  <option value="Over 10%">Over 10%</option>
+                </select>
+                <select
+                  className="h-10 rounded-md border border-input bg-background px-3 py-2"
+                  value={selectedValue}
+                  onChange={(e) => setSelectedValue(e.target.value)}
+                >
+                  <option value="All">All Values</option>
+                  <option value="Under $100K">Under $100K</option>
+                  <option value="$100K-$500K">$100K-$500K</option>
+                  <option value="Over $500K">Over $500K</option>
+                </select>
+                <select
+                  className="h-10 rounded-md border border-input bg-background px-3 py-2"
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                >
+                  <option value="All">All Statuses</option>
+                  <option value="Active">Active</option>
+                  <option value="Pending">Pending</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
-          <AnimatePresence mode="wait">
-            <TabsContent value="assets" className="space-y-4 pt-4">
-              <GlassmorphicCard
-                title="Available Assets"
-                description="Browse tokenized EV assets available for investment"
-                accentColor={accentColor}
-              >
-                <div className="mb-6 space-y-4 p-4">
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <div className="flex-1 relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="search"
-                        placeholder="Search assets..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-9 border-gray-200 focus:border-[#fbdc3e] focus:ring-[#fbdc3e]"
-                      />
+          {filteredLoans.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No loans available matching your criteria.</p>
+            </div>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {filteredLoans.map((loan, index) => (
+                <Card key={loan.id} className="overflow-hidden h-full flex flex-col">
+                  <div className="relative h-48">
+                    <Image 
+                      src={loan.image || "/placeholder.svg?height=200&width=300"} 
+                      alt={loan.name} 
+                      fill 
+                      className="object-cover" 
+                    />
+                    <div className="absolute top-2 right-2">
+                      <Badge className={`${loan.status === "Active" ? "bg-green-500" : "bg-yellow-500"}`}>
+                        {loan.status}
+                      </Badge>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      <div className="relative">
-                        <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <select
-                          className="h-10 rounded-md border border-gray-200 bg-white pl-9 pr-3 py-2 focus:border-[#fbdc3e] focus:ring-[#fbdc3e]"
-                          value={selectedType}
-                          onChange={(e) => setSelectedType(e.target.value)}
-                        >
-                          <option value="All">All Types</option>
-                          <option value="Bus">Bus</option>
-                          <option value="Van">Van</option>
-                          <option value="Taxi">Taxi</option>
-                          <option value="Utility">Utility</option>
-                        </select>
-                      </div>
-                      <div className="relative">
-                        <Percent className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <select
-                          className="h-10 rounded-md border border-gray-200 bg-white pl-9 pr-3 py-2 focus:border-[#fbdc3e] focus:ring-[#fbdc3e]"
-                          value={selectedYield}
-                          onChange={(e) => setSelectedYield(e.target.value)}
-                        >
-                          <option value="All">All Yields</option>
-                          <option value="Under 5%">Under 5%</option>
-                          <option value="5-6%">5-6%</option>
-                          <option value="Over 6%">Over 6%</option>
-                        </select>
-                      </div>
-                      <div className="relative">
-                        <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <select
-                          className="h-10 rounded-md border border-gray-200 bg-white pl-9 pr-3 py-2 focus:border-[#fbdc3e] focus:ring-[#fbdc3e]"
-                          value={selectedValue}
-                          onChange={(e) => setSelectedValue(e.target.value)}
-                        >
-                          <option value="All">All Values</option>
-                          <option value="Under $500K">Under $500K</option>
-                          <option value="$500K-$1M">$500K-$1M</option>
-                          <option value="Over $1M">Over $1M</option>
-                        </select>
-                      </div>
+                    <div className="absolute top-2 left-2">
+                      <Badge className="bg-[#4f1964]">EV Loan</Badge>
                     </div>
                   </div>
-                </div>
-
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 p-4">
-                  {filteredAssets.length > 0 ? (
-                    filteredAssets.map((asset, index) => (
-                      <motion.div
-                        key={asset.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: 0.05 * index }}
-                        whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                        className="group"
-                      >
-                        <Card className="overflow-hidden border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-md h-full">
-                          <div className="relative h-48">
-                            <Image src={asset.image || "/placeholder.svg"} alt={asset.name} fill className="object-cover" />
-                            <div className="absolute top-2 right-2">
-                              <Badge
-                                className="bg-white/80 backdrop-blur-sm text-black border border-gray-200"
-                                style={{ boxShadow: "0 2px 10px rgba(0,0,0,0.1)" }}
-                              >
-                                {asset.type}
-                              </Badge>
-                            </div>
-                            <div
-                              className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                            ></div>
-                          </div>
-                          <CardContent className="p-4">
-                            <h3 className="font-semibold text-lg mb-2 line-clamp-1">{asset.name}</h3>
-                            <div className="grid grid-cols-2 gap-2 mb-4 text-sm">
-                              <div>
-                                <p className="text-gray-500 flex items-center gap-1">
-                                  <DollarSign className="h-3 w-3" /> Value
-                                </p>
-                                <p className="font-medium">${asset.value.toLocaleString()}</p>
-                              </div>
-                              <div>
-                                <p className="text-gray-500 flex items-center gap-1">
-                                  <Percent className="h-3 w-3" /> Yield
-                                </p>
-                                <p className="font-medium text-green-600">{asset.yield}%</p>
-                              </div>
-                              <div>
-                                <p className="text-gray-500">Available</p>
-                                <p className="font-medium">${asset.available.toLocaleString()}</p>
-                              </div>
-                              <div>
-                                <p className="text-gray-500">Min. Investment</p>
-                                <p className="font-medium">${asset.minInvestment.toLocaleString()}</p>
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <div className="text-sm text-gray-500 flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                <p>{asset.location}</p>
-                              </div>
-                              <Button
-                                className="transition-transform duration-300 group-hover:scale-105"
-                                style={{ backgroundColor: accentColor, color: "#4f1964" }}
-                              >
-                                Invest
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    ))
-                  ) : (
-                    <div className="col-span-3 py-8 text-center">
-                      <p className="text-muted-foreground">No assets found matching your criteria.</p>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="line-clamp-1">{loan.name}</CardTitle>
+                    <CardDescription>ID: {loan.id}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-1 pb-4">
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <p className="text-gray-500 text-sm">Loan Amount</p>
+                        <p className="font-bold">${loan.amount.toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-sm">Annual Yield</p>
+                        <p className="font-bold text-green-600 flex items-center">
+                          {loan.yield}% <Percent className="h-4 w-4 ml-1" />
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-sm">Available</p>
+                        <p className="font-bold">${loan.available.toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-sm">Min. Investment</p>
+                        <p className="font-bold">${loan.minInvestment.toLocaleString()}</p>
+                      </div>
                     </div>
+                    
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Operator:</span>
+                        <span className="font-medium">{loan.operator}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Duration:</span>
+                        <span className="font-medium">{loan.duration} months</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Monthly Interest:</span>
+                        <span className="font-medium">
+                          {loan.monthlyInterest ? loan.monthlyInterest : ((loan.yield || 0) / 12).toFixed(2)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Created:</span>
+                        <span className="font-medium">{new Date(loan.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <div className="p-4 pt-0 mt-auto">
+                    <Button 
+                      className="w-full bg-[#fbdc3e] text-black hover:bg-[#fbdc3e]/90"
+                      onClick={() => handleInvest(loan.id)}
+                      disabled={loan.available < loan.minInvestment}
+                    >
+                      Invest
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+          
+          {selectedInvestment && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <Card className="w-full max-w-md">
+                <CardHeader>
+                  <CardTitle>Make Investment</CardTitle>
+                  <CardDescription>
+                    {loans.find(l => l.id === selectedInvestment)?.name}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {isInvesting ? (
+                    <div className="py-6 space-y-4">
+                      <Progress value={investmentProgress} />
+                      <p className="text-center text-sm text-muted-foreground">
+                        Processing investment... {investmentProgress}%
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="mb-6 space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="loan-amount">Available</Label>
+                            <div className="font-medium pt-2">
+                              ${loans.find(l => l.id === selectedInvestment)?.available.toLocaleString()}
+                            </div>
+                          </div>
+                          <div>
+                            <Label htmlFor="min-investment">Min. Investment</Label>
+                            <div className="font-medium pt-2">
+                              ${loans.find(l => l.id === selectedInvestment)?.minInvestment.toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <Alert className="bg-blue-50 border-blue-200">
+                          <InfoIcon className="h-4 w-4 text-blue-600" />
+                          <AlertDescription className="text-blue-700">
+                            Annual yield: {loans.find(l => l.id === selectedInvestment)?.yield}%
+                          </AlertDescription>
+                        </Alert>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="investment-amount">Investment Amount ($)</Label>
+                          <Input
+                            id="investment-amount"
+                            type="number"
+                            placeholder="Enter amount to invest"
+                            value={investmentAmount}
+                            onChange={(e) => setInvestmentAmount(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-4">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={closeInvestmentModal}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          className="flex-1 bg-[#fbdc3e] text-black hover:bg-[#fbdc3e]/90"
+                          onClick={handleSubmitInvestment}
+                          disabled={
+                            !investmentAmount || 
+                            parseFloat(investmentAmount) < (loans.find(l => l.id === selectedInvestment)?.minInvestment || 0) ||
+                            parseFloat(investmentAmount) > (loans.find(l => l.id === selectedInvestment)?.available || 0)
+                          }
+                        >
+                          Confirm Investment
+                        </Button>
+                      </div>
+                    </>
                   )}
-                </div>
-              </GlassmorphicCard>
-            </TabsContent>
-
-            <TabsContent value="liquidity" className="space-y-4 pt-4">
-              <GlassmorphicCard
-                title="Liquidity Pool"
-                description="Invest in liquidity pools and earn yield"
-                accentColor={accentColor}
-              >
-                <div className="p-4">
-                  <LiquidityPoolInterface />
-                </div>
-              </GlassmorphicCard>
-            </TabsContent>
-          </AnimatePresence>
-        </Tabs>
-      </motion.div>
-    </motion.div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   )
 }
+
+// Convert default loans to marketplace format
+function convertDefaultLoansToMarketplace(defaultLoans: Loan[]): MarketplaceLoan[] {
+  return defaultLoans.map(loan => {
+    const yearlyYield = loan.monthlyInterest 
+      ? loan.monthlyInterest * 12
+      : (((loan.repaymentAmount / loan.amount) - 1) * 100) / (loan.duration / 12);
+      
+    const availablePercentage = Math.random() * 25 + 70;
+    const available = Math.round(loan.amount * (availablePercentage / 100));
+    
+    const minPercentage = Math.random() * 4 + 1;
+    const minInvestment = Math.round(loan.amount * (minPercentage / 100));
+    
+    return {
+      ...loan,
+      yield: parseFloat(yearlyYield.toFixed(2)),
+      available: available,
+      minInvestment: minInvestment,
+    };
+  });
+}
+
+// Default loans in case there are no admin-created loans
+const defaultLoans: Loan[] = [
+  {
+    id: "LOAN-001",
+    name: "EV Loan - MetroTransit",
+    image: "/images/electric-bus.jpeg",
+    operator: "MetroTransit",
+    borrower: "0x8Ab76F03D2Acf190705EE1FcA0C794931EE2A3B0",
+    adminAddress: "0x4a2de44F7c609Af73852CC99a3fCc318A91C83Bd",
+    amount: 450000,
+    repaymentAmount: 495000,
+    monthlyInterest: 0.83,
+    duration: 24,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
+    status: "Active",
+    transactionHash: "0x" + "1".repeat(64),
+  },
+  {
+    id: "LOAN-002",
+    name: "EV Loan - EcoDelivery",
+    image: "/images/ford-vehicle.jpeg",
+    operator: "EcoDelivery",
+    borrower: "0x8Ab76F03D2Acf190705EE1FcA0C794931EE2A3B0",
+    adminAddress: "0x4a2de44F7c609Af73852CC99a3fCc318A91C83Bd",
+    amount: 85000,
+    repaymentAmount: 93500,
+    monthlyInterest: 0.55,
+    duration: 18,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 60).toISOString(),
+    status: "Active",
+    transactionHash: "0x" + "2".repeat(64),
+  },
+  {
+    id: "LOAN-003",
+    name: "EV Loan - GreenCab",
+    image: "/images/ford.jpeg",
+    operator: "GreenCab",
+    borrower: "0x8Ab76F03D2Acf190705EE1FcA0C794931EE2A3B0",
+    adminAddress: "0x4a2de44F7c609Af73852CC99a3fCc318A91C83Bd",
+    amount: 320000,
+    repaymentAmount: 368000,
+    monthlyInterest: 0.5,
+    duration: 36,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15).toISOString(),
+    status: "Pending",
+    transactionHash: "0x" + "3".repeat(64),
+  }
+];
