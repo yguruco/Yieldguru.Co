@@ -12,13 +12,14 @@ import FAQSection from "@/components/sections/faq-section"
 import CTASection from "@/components/sections/cta-section"
 import BlogSection from "@/components/sections/blog-section"
 import FooterSection from "@/components/sections/footer-section"
-
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
+      
       <HeroSection />
       <DashboardSection />
+
       <FeaturesSection />
       {/* <CTASection /> */}
 

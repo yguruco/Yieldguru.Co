@@ -1,200 +1,217 @@
 "use client"
 
-import { motion, AnimatePresence } from "framer-motion"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react"
+import { motion } from "framer-motion"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Wallet, BarChart3, TrendingUp, Percent, CreditCard } from "lucide-react"
-import GlassmorphicCard from "@/components/dashboard/glassmorphic-card"
-import NeumorphicStatCard from "@/components/dashboard/neumorphic-stat-card"
-import { ChartPlaceholder } from "@/components/dashboard/chart-placeholder"
-
-const portfolioData = [
-  { month: "Jan", value: 10000 },
-  { month: "Feb", value: 12000 },
-  { month: "Mar", value: 11500 },
-  { month: "Apr", value: 13500 },
-  { month: "May", value: 14800 },
-  { month: "Jun", value: 16200 },
-]
-
-const yieldData = [
-  { month: "Jan", value: 4.2 },
-  { month: "Feb", value: 4.3 },
-  { month: "Mar", value: 4.1 },
-  { month: "Apr", value: 4.5 },
-  { month: "May", value: 4.7 },
-  { month: "Jun", value: 4.9 },
-]
+import { ArrowUpRight } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Progress } from "@/components/ui/progress"
+import { Check, AlertTriangle } from "lucide-react"
+import { ethers } from "ethers"
+import { myLoanContract } from "@/contractsAbi/LoanContractABI"
+import { 
+  useAccount,
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt
+} from 'wagmi'
 
 export default function InvestorDashboard() {
-  const accentColor = "#fbdc3e";
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
+  // Investment functionality
+  const [error, setError] = useState("")
+  const [investAmount, setInvestAmount] = useState("")
+  const [txProgress, setTxProgress] = useState(0)
+  
+  // Wagmi hooks
+  const { address, isConnected } = useAccount()
+  const { data: hash, isPending, writeContract } = useWriteContract()
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = 
+    useWaitForTransactionReceipt({ hash })
+    
+  // Get loan data from contract
+  const { data: borrowerData } = useReadContract({
+    address: myLoanContract.address,
+    abi: myLoanContract.abi,
+    functionName: 'borrower',
+  })
+  
+  const { data: amountBorrowedData } = useReadContract({
+    address: myLoanContract.address,
+    abi: myLoanContract.abi,
+    functionName: 'amountBorrowed',
+  })
+  
+  const { data: repaymentAmountData } = useReadContract({
+    address: myLoanContract.address,
+    abi: myLoanContract.abi,
+    functionName: 'repaymentAmount',
+  })
+  
+  const { data: balanceData } = useReadContract({
+    address: myLoanContract.address,
+    abi: myLoanContract.abi,
+    functionName: 'getBalance',
+  })
+  
+  // Format loan details
+  const loanDetails = {
+    borrower: borrowerData ? String(borrowerData) : "",
+    amountBorrowed: amountBorrowedData ? ethers.formatEther(amountBorrowedData.toString()) : "0",
+    repaymentAmount: repaymentAmountData ? ethers.formatEther(repaymentAmountData.toString()) : "0",
+    balance: balanceData ? ethers.formatEther(balanceData.toString()) : "0"
+  }
+  
+  // Invest in loan
+  const investInLoan = () => {
+    if (!investAmount) {
+      setError("Please enter an amount to invest")
+      return
     }
-  };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-  };
+    try {
+      setError("")
+      writeContract({
+        address: myLoanContract.address,
+        abi: myLoanContract.abi,
+        functionName: 'investLoan',
+        value: ethers.parseUnits(investAmount, 18)
+      })
+      
+      if (isConfirmed) {
+        setInvestAmount("")
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to invest in loan")
+    }
+  }
 
   return (
-    <motion.div
-      className="space-y-6"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <motion.div variants={itemVariants}>
-          <NeumorphicStatCard
-            title="Portfolio Value"
-            value="$16,200"
-            description="+9.5% from last month"
-            trend="up"
-            trendValue="9.5%"
-            icon={<Wallet className="h-5 w-5 text-[#fbdc3e]" />}
-            accentColor={accentColor}
-          />
-        </motion.div>
-        <motion.div variants={itemVariants}>
-          <NeumorphicStatCard
-            title="Current Yield"
-            value="4.9%"
-            description="+0.2% from last month"
-            trend="up"
-            trendValue="0.2%"
-            icon={<Percent className="h-5 w-5 text-[#fbdc3e]" />}
-            accentColor={accentColor}
-          />
-        </motion.div>
-        <motion.div variants={itemVariants}>
-          <NeumorphicStatCard
-            title="Total Assets"
-            value="12"
-            description="+2 from last month"
-            trend="up"
-            trendValue="2"
-            icon={<CreditCard className="h-5 w-5 text-[#fbdc3e]" />}
-            accentColor={accentColor}
-          />
-        </motion.div>
-        <motion.div variants={itemVariants}>
-          <NeumorphicStatCard
-            title="Monthly Income"
-            value="$780"
-            description="+$45 from last month"
-            trend="up"
-            trendValue="$45"
-            icon={<BarChart3 className="h-5 w-5 text-[#fbdc3e]" />}
-            accentColor={accentColor}
-          />
-        </motion.div>
+    <div className="space-y-6">
+      <div className="grid gap-6 md:grid-cols-3">
+        <StatCard title="Portfolio Value" value="$16,200" description="+9.5% from last month" />
+        <StatCard title="Current Yield" value="4.9%" description="+0.2% from last month" />
+        <StatCard title="Total Assets" value="12" description="+2 from last month" />
       </div>
 
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
-        <motion.div variants={itemVariants} className="lg:col-span-2">
-          <GlassmorphicCard
-            title="Portfolio Performance"
-            description="Your investment growth over time"
-            accentColor={accentColor}
-          >
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={portfolioData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`$${value}`, "Value"]} />
-                  <Area type="monotone" dataKey="value" stroke={accentColor} fill={accentColor} fillOpacity={0.3} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </GlassmorphicCard>
-        </motion.div>
+      {/* Investment Component */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Invest in EV Loans</CardTitle>
+          <CardDescription>Invest directly in tokenized EV loans</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <Alert variant="destructive" className="mb-4 bg-red-50 border border-red-200">
+              <AlertTriangle className="h-4 w-4 text-red-600" />
+              <AlertTitle className="text-red-800">Error</AlertTitle>
+              <AlertDescription className="text-red-800">{error}</AlertDescription>
+            </Alert>
+          )}
 
-        <motion.div variants={itemVariants}>
-          <GlassmorphicCard
-            title="Investment Opportunities"
-            description="New tokenized assets available for investment"
-            accentColor={accentColor}
-          >
-            <div className="space-y-4 py-2">
-              <OpportunityCard
-                title="Electric Bus Fleet"
-                yield="5.2%"
-                minInvestment="$1,000"
-                available="$245,000"
-                index={0}
-                accentColor={accentColor}
-              />
-              <OpportunityCard
-                title="Taxi EV Network"
-                yield="4.8%"
-                minInvestment="$500"
-                available="$120,000"
-                index={1}
-                accentColor={accentColor}
-              />
-              <OpportunityCard
-                title="Delivery Vans"
-                yield="5.5%"
-                minInvestment="$2,000"
-                available="$380,000"
-                index={2}
-                accentColor={accentColor}
-              />
-            </div>
-          </GlassmorphicCard>
-        </motion.div>
-      </div>
+          {isConfirmed && (
+            <Alert className="mb-4 bg-[#f68b27]/10 border border-[#f68b27]/30">
+              <Check className="h-4 w-4 text-[#f68b27]" />
+              <AlertTitle className="text-[#f68b27]">Success</AlertTitle>
+              <AlertDescription className="text-[#f68b27]">Investment completed successfully!</AlertDescription>
+            </Alert>
+          )}
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <motion.div variants={itemVariants}>
-          <GlassmorphicCard
-            title="Yield Trends"
-            description="Monthly yield percentage"
-            accentColor={accentColor}
-          >
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={yieldData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`${value}%`, "Yield"]} />
-                  <Line type="monotone" dataKey="value" stroke="#f68b27" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
+          {isPending && (
+            <div className="mb-4">
+              <p className="text-sm mb-2 text-[#4f1964]">Processing investment...</p>
+              <Progress value={txProgress} className="h-2 bg-[#fbdc3e]/20" />
             </div>
-          </GlassmorphicCard>
-        </motion.div>
+          )}
+          
+          {hash && (
+            <Alert className="mt-4 bg-[#fbdc3e]/10 border border-[#fbdc3e]/30">
+              <AlertDescription>
+                <div className="text-sm font-medium text-[#4f1964]">Transaction Hash:</div>
+                <div className="text-xs break-all text-[#4f1964]/80">{hash}</div>
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {isConfirming && (
+            <Alert className="mt-4 bg-[#fbdc3e]/20 border border-[#fbdc3e]/40">
+              <AlertDescription className="text-[#4f1964] font-medium">
+                Waiting for confirmation...
+              </AlertDescription>
+            </Alert>
+          )}
 
-        <motion.div variants={itemVariants}>
-          <GlassmorphicCard
-            title="Asset Distribution"
-            description="Breakdown of your investment portfolio"
-            accentColor={accentColor}
-          >
-            <ChartPlaceholder
-              height={300}
-              type="pie"
-              title="Asset Distribution"
-              description="Breakdown by vehicle type"
-              accentColor={accentColor}
-            />
-          </GlassmorphicCard>
-        </motion.div>
-      </div>
-    </motion.div>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-4 bg-[#fbdc3e]/5 rounded-md border border-[#fbdc3e]/20">
+              <h3 className="text-lg font-semibold mb-2 text-[#4f1964]">Loan Details</h3>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <div className="mb-2 text-[#4f1964]">
+                    <strong>Borrower:</strong> {loanDetails.borrower ? `${loanDetails.borrower.slice(0, 6)}...${loanDetails.borrower.slice(-4)}` : 'Loading...'}
+                  </div>
+                  <div className="mb-2 text-[#4f1964]">
+                    <strong>Amount Borrowed:</strong> {loanDetails.amountBorrowed} ETH
+                  </div>
+                  <div className="mb-2 text-[#4f1964]">
+                    <strong>Repayment Amount:</strong> {loanDetails.repaymentAmount} ETH
+                  </div>
+                  <div className="mb-2 text-[#4f1964]">
+                    <strong>Current Balance:</strong> {loanDetails.balance} ETH
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-4 p-4 bg-[#fbdc3e]/5 rounded-md border border-[#fbdc3e]/20">
+              <div className="space-y-2">
+                <Label htmlFor="invest-amount" className="text-[#4f1964] font-medium">Amount to Invest (ETH)</Label>
+                <Input
+                  id="invest-amount"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.0"
+                  value={investAmount}
+                  onChange={(e) => setInvestAmount(e.target.value)}
+                  className="border-[#4f1964]/30 focus:border-[#4f1964] focus:ring-[#4f1964]/20"
+                />
+              </div>
+              <Button 
+                onClick={investInLoan} 
+                disabled={isPending || isConfirming || !investAmount || !isConnected}
+                className="bg-[#4f1964] hover:bg-[#3b1149] text-[#fbdc3e] font-medium border border-[#fbdc3e]/20"
+              >
+                {isPending || isConfirming ? 'Processing...' : 'Invest in Loan'}
+              </Button>
+              {!isConnected && (
+                <Alert className="mt-2">
+                  <AlertDescription>Please connect your wallet to invest</AlertDescription>
+                </Alert>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            Investment Opportunities
+            <Button style={{ backgroundColor: "#fbdc3e", color: "#4f1964" }} size="sm">
+              View All <ArrowUpRight className="ml-1 h-4 w-4" />
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <OpportunityCard title="Electric Bus Fleet" yield="5.2%" minInvestment="$1,000" available="$245,000" />
+            <OpportunityCard title="Taxi EV Network" yield="4.8%" minInvestment="$500" available="$120,000" />
+            <OpportunityCard title="Delivery Vans" yield="5.5%" minInvestment="$2,000" available="$380,000" />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 
@@ -202,22 +219,19 @@ interface StatCardProps {
   title: string
   value: string
   description: string
-  delay: number
 }
 
-function StatCard({ title, value, description, delay }: StatCardProps) {
+function StatCard({ title, value, description }: StatCardProps) {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay }}>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{value}</div>
-          <p className="text-xs text-muted-foreground">{description}</p>
-        </CardContent>
-      </Card>
-    </motion.div>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
   )
 }
 

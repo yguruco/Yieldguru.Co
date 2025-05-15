@@ -1,417 +1,246 @@
 "use client"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ChartPlaceholder } from "@/components/dashboard/chart-placeholder"
-import LiquidityPoolInterface from "@/components/liquidity-pool-interface"
-import { BarChart3, Car, CreditCard, Percent, Zap, Calendar, MapPin, AlertTriangle, TrendingUp, Activity } from "lucide-react"
-import GlassmorphicCard from "@/components/dashboard/glassmorphic-card"
-import NeumorphicStatCard from "@/components/dashboard/neumorphic-stat-card"
-import VehicleStatusCard from "@/components/dashboard/vehicle-status-card"
-import { motion, AnimatePresence } from "framer-motion"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { StatCard } from "@/components/ui/stat-card"
+import { ShieldCheck, CalendarClock, Info, Clock, XCircle } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+
+interface ApprovedLoan {
+  id: string
+  name: string
+  amount: number
+  status: string
+  createdAt: string
+  repaymentAmount: number
+  duration: number
+  monthlyInterest: number
+}
+
+interface ApplicationStats {
+  approved: number
+  rejected: number
+  pending: number
+}
 
 export default function OperatorDashboardPage() {
-  const [activeTab, setActiveTab] = useState("overview")
-  const accentColor = "#f68b27"
+  const [approvedLoans, setApprovedLoans] = useState<ApprovedLoan[]>([])
+  const [applicationStats, setApplicationStats] = useState<ApplicationStats>({
+    approved: 0,
+    rejected: 0,
+    pending: 0
+  })
+  const [loading, setLoading] = useState(true)
 
-  // Animation variants for tab transitions
-  const tabVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        staggerChildren: 0.1
+  useEffect(() => {
+    // Fetch real data from localStorage
+    const fetchData = () => {
+      setLoading(true)
+      try {
+        // Get loans from localStorage
+        const adminLoansStr = localStorage.getItem("adminLoans")
+        const adminLoans = adminLoansStr ? JSON.parse(adminLoansStr) : []
+        
+        // Filter loans that belong to the current operator
+        // In a real app, we would filter by the current user's address
+        const operatorLoans = adminLoans.filter(
+          (loan: any) => loan.status === "Active"
+        )
+        
+        // Get RFL applications from localStorage
+        const rflSubmissionsStr = localStorage.getItem("rflSubmissions")
+        const rflSubmissions = rflSubmissionsStr ? JSON.parse(rflSubmissionsStr) : []
+        
+        // Calculate application stats
+        const approved = operatorLoans.length
+        const pending = rflSubmissions.filter(
+          (sub: any) => sub.status === "pending" || sub.status === "in-review"
+        ).length
+        const rejected = rflSubmissions.filter(
+          (sub: any) => sub.status === "rejected"
+        ).length
+        
+        // Set the data
+        setApprovedLoans(operatorLoans)
+        setApplicationStats({
+          approved,
+          rejected,
+          pending
+        })
+        
+        setLoading(false)
+      } catch (error) {
+        console.error("Error fetching data:", error)
+        setLoading(false)
       }
-    },
-    exit: {
-      opacity: 0,
-      y: -20,
-      transition: { duration: 0.3 }
     }
-  }
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  }
+    fetchData()
+  }, [])
+
+  // Calculate total loan value and other stats
+  const totalLoanValue = approvedLoans.reduce((sum, loan) => sum + loan.amount, 0)
+  const totalRepaymentValue = approvedLoans.reduce((sum, loan) => sum + loan.repaymentAmount, 0)
+  const averageDuration = approvedLoans.length 
+    ? Math.round(approvedLoans.reduce((sum, loan) => sum + loan.duration, 0) / approvedLoans.length) 
+    : 0
 
   return (
-    <div className="space-y-8">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="flex flex-col md:flex-row md:items-end md:justify-between gap-4"
-      >
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-xl"
-              style={{
-                background: `linear-gradient(135deg, ${accentColor}, ${accentColor}80)`,
-                boxShadow: `0 3px 10px ${accentColor}40`
-              }}
-            >
-              <Car className="h-5 w-5 text-white" />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">EV-Operator Dashboard</h1>
+        <p className="text-muted-foreground">Monitor your EV loans and applications</p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          title="Total Loan Value"
+          value={`$${totalLoanValue.toLocaleString()}`}
+          description="Total value of approved EV loans"
+          trend="up"
+          trendValue=""
+        />
+        <StatCard
+          title="Approved Applications"
+          value={applicationStats.approved.toString()}
+          description="Number of approved applications"
+          trend="up"
+          trendValue=""
+          className="bg-green-50 border-green-100"
+          icon={<ShieldCheck className="h-4 w-4 text-green-500" />}
+        />
+        <StatCard
+          title="Pending Applications"
+          value={applicationStats.pending.toString()}
+          description="Awaiting approval decision"
+          trend="neutral"
+          trendValue=""
+          className="bg-amber-50 border-amber-100"
+          icon={<Clock className="h-4 w-4 text-amber-500" />}
+        />
+        <StatCard
+          title="Rejected Applications"
+          value={applicationStats.rejected.toString()}
+          description="Applications that were declined"
+          trend="down"
+          trendValue=""
+          className="bg-red-50 border-red-100"
+          icon={<XCircle className="h-4 w-4 text-red-500" />}
+        />
+      </div>
+
+      {/* Application timeline summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Application Status Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="relative">
+            {/* Progress bar */}
+            <div className="w-full h-4 bg-gray-100 rounded-full overflow-hidden">
+              {/* Only show if there are any applications */}
+              {(applicationStats.approved + applicationStats.rejected + applicationStats.pending) > 0 && (
+                <>
+                  <div 
+                    className="h-full bg-green-500 float-left" 
+                    style={{ 
+                      width: `${applicationStats.approved / (applicationStats.approved + applicationStats.rejected + applicationStats.pending) * 100}%` 
+                    }}
+                  ></div>
+                  <div 
+                    className="h-full bg-amber-500 float-left" 
+                    style={{ 
+                      width: `${applicationStats.pending / (applicationStats.approved + applicationStats.rejected + applicationStats.pending) * 100}%` 
+                    }}
+                  ></div>
+                  <div 
+                    className="h-full bg-red-500 float-left" 
+                    style={{ 
+                      width: `${applicationStats.rejected / (applicationStats.approved + applicationStats.rejected + applicationStats.pending) * 100}%` 
+                    }}
+                  ></div>
+                </>
+              )}
             </div>
-            <h1 className="text-3xl font-bold tracking-tight shimmer">EV-Operator Dashboard</h1>
-          </div>
-          <p className="text-muted-foreground">Monitor and manage your EV fleet performance and tokenized assets</p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm">
-            <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-            <span className="text-sm font-medium">System Status: Operational</span>
-          </div>
-          <div
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full shadow-sm"
-            style={{
-              background: `linear-gradient(to right, ${accentColor}20, ${accentColor}10)`,
-              border: `1px solid ${accentColor}30`
-            }}
-          >
-            <Calendar className="h-4 w-4" style={{ color: accentColor }} />
-            <span className="text-sm font-medium">Today: {new Date().toLocaleDateString()}</span>
-          </div>
-        </div>
-      </motion.div>
-
-      <Tabs
-        defaultValue="overview"
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="w-full"
-      >
-        <TabsList
-          className="w-full max-w-md mx-auto mb-6 p-1 rounded-full bg-white/80 backdrop-blur-sm shadow-[0_2px_10px_rgba(0,0,0,0.05)]"
-        >
-          <TabsTrigger
-            value="overview"
-            className="rounded-full data-[state=active]:shadow-md transition-all duration-300"
-            style={{
-              color: activeTab === "overview" ? "white" : undefined,
-              background: activeTab === "overview" ? accentColor : undefined
-            }}
-          >
-            <Activity className="mr-2 h-4 w-4" />
-            Overview
-          </TabsTrigger>
-          <TabsTrigger
-            value="performance"
-            className="rounded-full data-[state=active]:shadow-md transition-all duration-300"
-            style={{
-              color: activeTab === "performance" ? "white" : undefined,
-              background: activeTab === "performance" ? accentColor : undefined
-            }}
-          >
-            <TrendingUp className="mr-2 h-4 w-4" />
-            Performance
-          </TabsTrigger>
-          <TabsTrigger
-            value="liquidity"
-            className="rounded-full data-[state=active]:shadow-md transition-all duration-300"
-            style={{
-              color: activeTab === "liquidity" ? "white" : undefined,
-              background: activeTab === "liquidity" ? accentColor : undefined
-            }}
-          >
-            <Zap className="mr-2 h-4 w-4" />
-            Liquidity Pool
-          </TabsTrigger>
-        </TabsList>
-
-        <AnimatePresence mode="wait">
-          {activeTab === "overview" && (
-            <motion.div
-              key="overview"
-              variants={tabVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="space-y-6"
-            >
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <motion.div variants={itemVariants}>
-                  <NeumorphicStatCard
-                    title="Total Fleet Value"
-                    value="$1.2M"
-                    description="Total value of tokenized fleet"
-                    trend="up"
-                    trendValue="12%"
-                    icon={<CreditCard className="h-5 w-5 text-[#f68b27]" />}
-                  />
-                </motion.div>
-                <motion.div variants={itemVariants}>
-                  <NeumorphicStatCard
-                    title="Active Vehicles"
-                    value="24"
-                    description="Vehicles currently in operation"
-                    trend="up"
-                    trendValue="2"
-                    icon={<Car className="h-5 w-5 text-[#f68b27]" />}
-                  />
-                </motion.div>
-                <motion.div variants={itemVariants}>
-                  <NeumorphicStatCard
-                    title="Monthly Revenue"
-                    value="$85.4K"
-                    description="Revenue generated this month"
-                    trend="up"
-                    trendValue="8.2%"
-                    icon={<BarChart3 className="h-5 w-5 text-[#f68b27]" />}
-                  />
-                </motion.div>
-                <motion.div variants={itemVariants}>
-                  <NeumorphicStatCard
-                    title="Tokenization Rate"
-                    value="68%"
-                    description="Percentage of fleet tokenized"
-                    trend="up"
-                    trendValue="5%"
-                    icon={<Percent className="h-5 w-5 text-[#f68b27]" />}
-                  />
-                </motion.div>
+            
+            {/* Legend */}
+            <div className="flex justify-between mt-4">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                <span className="text-sm">Approved ({applicationStats.approved})</span>
               </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-amber-500 rounded-full mr-2"></div>
+                <span className="text-sm">Pending ({applicationStats.pending})</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                <span className="text-sm">Rejected ({applicationStats.rejected})</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-              <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
-                <motion.div variants={itemVariants} className="lg:col-span-2">
-                  <GlassmorphicCard
-                    title="Fleet Performance"
-                    description="Daily performance metrics for your fleet"
-                  >
-                    <ChartPlaceholder height={300} />
-                  </GlassmorphicCard>
-                </motion.div>
-
-                <motion.div variants={itemVariants}>
-                  <GlassmorphicCard
-                    title="Alerts & Notifications"
-                    description="Recent system alerts"
-                  >
-                    <div className="space-y-4 py-2">
-                      <div className="flex items-start gap-3 p-3 rounded-lg bg-red-50 border border-red-100">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100">
-                          <AlertTriangle className="h-4 w-4 text-red-600" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-red-800">Low Battery Alert</h4>
-                          <p className="text-sm text-red-600">EV-003 battery below 30%</p>
-                          <p className="text-xs text-red-500 mt-1">10 minutes ago</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-50 border border-amber-100">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
-                          <Calendar className="h-4 w-4 text-amber-600" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-amber-800">Maintenance Due</h4>
-                          <p className="text-sm text-amber-600">EV-002 scheduled for maintenance</p>
-                          <p className="text-xs text-amber-500 mt-1">2 hours ago</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50 border border-green-100">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
-                          <Zap className="h-4 w-4 text-green-600" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-green-800">Charging Complete</h4>
-                          <p className="text-sm text-green-600">EV-005 fully charged and ready</p>
-                          <p className="text-xs text-green-500 mt-1">30 minutes ago</p>
-                        </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Approved Loans</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin h-8 w-8 border-4 border-[#f68b27] border-t-transparent rounded-full"></div>
+            </div>
+          ) : approvedLoans.length === 0 ? (
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                No approved loans found. Apply for new EV loans through the RFL application process.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
+              {approvedLoans.map((loan) => (
+                <Card key={loan.id} className="border-2 border-gray-100">
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="font-semibold text-lg">{loan.name}</div>
+                      <div className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 flex items-center">
+                        <ShieldCheck className="h-3 w-3 mr-1" />
+                        {loan.status}
                       </div>
                     </div>
-                  </GlassmorphicCard>
-                </motion.div>
-              </div>
-
-              <motion.div variants={itemVariants}>
-                <GlassmorphicCard
-                  title="Revenue Breakdown"
-                  description="Revenue sources by category"
-                >
-                  <ChartPlaceholder height={250} />
-                </GlassmorphicCard>
-              </motion.div>
-
-              <motion.div variants={itemVariants}>
-                <GlassmorphicCard
-                  title="Fleet Status"
-                  description="Current status of your vehicle fleet"
-                >
-                  <div className="space-y-4 py-2">
-                    <VehicleStatusCard
-                      id="EV-001"
-                      type="Sedan"
-                      battery={85}
-                      status="Active"
-                      location="Downtown"
-                      lastMaintenance="2023-04-15"
-                      index={0}
-                    />
-                    <VehicleStatusCard
-                      id="EV-002"
-                      type="SUV"
-                      battery={62}
-                      status="Active"
-                      location="Airport"
-                      lastMaintenance="2023-05-02"
-                      index={1}
-                    />
-                    <VehicleStatusCard
-                      id="EV-003"
-                      type="Van"
-                      battery={28}
-                      status="Charging"
-                      location="Depot"
-                      lastMaintenance="2023-04-28"
-                      index={2}
-                    />
-                    <VehicleStatusCard
-                      id="EV-004"
-                      type="Sedan"
-                      battery={92}
-                      status="Active"
-                      location="Suburban"
-                      lastMaintenance="2023-05-10"
-                      index={3}
-                    />
-                    <VehicleStatusCard
-                      id="EV-005"
-                      type="Bus"
-                      battery={45}
-                      status="Maintenance"
-                      location="Service Center"
-                      lastMaintenance="2023-05-15"
-                      index={4}
-                    />
-                  </div>
-                </GlassmorphicCard>
-              </motion.div>
-            </motion.div>
+                    <div className="text-sm space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Loan Amount:</span>
+                        <span className="font-medium">${loan.amount.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Repayment Amount:</span>
+                        <span className="font-medium">${loan.repaymentAmount.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Duration:</span>
+                        <span className="font-medium">{loan.duration} months</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Monthly Interest:</span>
+                        <span className="font-medium">{loan.monthlyInterest}%</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs text-gray-500 pt-2 border-t border-gray-100 mt-2">
+                        <div className="flex items-center">
+                          <CalendarClock className="h-3 w-3 mr-1" />
+                          Created: {new Date(loan.createdAt).toLocaleDateString()}
+                        </div>
+                        <div className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full">ID: {loan.id}</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           )}
-
-          {activeTab === "performance" && (
-            <motion.div
-              key="performance"
-              variants={tabVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="space-y-6"
-            >
-              <div className="grid gap-6 md:grid-cols-4">
-                <motion.div variants={itemVariants}>
-                  <NeumorphicStatCard
-                    title="Energy Efficiency"
-                    value="92%"
-                    description="+4% from last month"
-                    trend="up"
-                    trendValue="4%"
-                    icon={<Zap className="h-5 w-5 text-[#f68b27]" />}
-                  />
-                </motion.div>
-                <motion.div variants={itemVariants}>
-                  <NeumorphicStatCard
-                    title="Avg. Daily Range"
-                    value="187 mi"
-                    description="+12 mi from last month"
-                    trend="up"
-                    trendValue="12 mi"
-                    icon={<MapPin className="h-5 w-5 text-[#f68b27]" />}
-                  />
-                </motion.div>
-                <motion.div variants={itemVariants}>
-                  <NeumorphicStatCard
-                    title="Charging Efficiency"
-                    value="78%"
-                    description="+2% from last month"
-                    trend="up"
-                    trendValue="2%"
-                    icon={<Zap className="h-5 w-5 text-[#f68b27]" />}
-                  />
-                </motion.div>
-                <motion.div variants={itemVariants}>
-                  <NeumorphicStatCard
-                    title="Maintenance Cost"
-                    value="$3,450"
-                    description="-8% from last month"
-                    trend="down"
-                    trendValue="8%"
-                    icon={<Activity className="h-5 w-5 text-[#f68b27]" />}
-                  />
-                </motion.div>
-              </div>
-
-              <motion.div variants={itemVariants}>
-                <GlassmorphicCard
-                  title="Performance Metrics"
-                  description="Detailed performance analytics for your fleet"
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
-                    <div className="bg-white/70 rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
-                      <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
-                          <Activity className="h-3 w-3" style={{ color: accentColor }} />
-                        </div>
-                        Utilization Rate
-                      </h3>
-                      <ChartPlaceholder height={200} />
-                    </div>
-                    <div className="bg-white/70 rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
-                      <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
-                          <Zap className="h-3 w-3" style={{ color: accentColor }} />
-                        </div>
-                        Energy Consumption
-                      </h3>
-                      <ChartPlaceholder height={200} />
-                    </div>
-                    <div className="bg-white/70 rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
-                      <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
-                          <Activity className="h-3 w-3" style={{ color: accentColor }} />
-                        </div>
-                        Maintenance Costs
-                      </h3>
-                      <ChartPlaceholder height={200} />
-                    </div>
-                    <div className="bg-white/70 rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300">
-                      <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
-                          <TrendingUp className="h-3 w-3" style={{ color: accentColor }} />
-                        </div>
-                        Revenue Trends
-                      </h3>
-                      <ChartPlaceholder height={200} />
-                    </div>
-                  </div>
-                </GlassmorphicCard>
-              </motion.div>
-            </motion.div>
-          )}
-
-          {activeTab === "liquidity" && (
-            <motion.div
-              key="liquidity"
-              variants={tabVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-            >
-              <motion.div variants={itemVariants}>
-                <GlassmorphicCard noPadding>
-                  <LiquidityPoolInterface />
-                </GlassmorphicCard>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </Tabs>
+        </CardContent>
+      </Card>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { motion } from "framer-motion"
 import {
   BarChart,
@@ -16,6 +17,19 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Check, AlertTriangle } from "lucide-react"
+import { ethers } from "ethers"
+import { myLoanContract } from "@/contractsAbi/LoanContractABI"
+import { 
+  useAccount,
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from 'wagmi'
 
 const utilizationData = [
   { day: "Mon", value: 78 },
@@ -37,6 +51,85 @@ const revenueData = [
 ]
 
 export default function OperatorDashboard() {
+  const [error, setError] = useState("")
+  const [txProgress, setTxProgress] = useState(0)
+  const [repayAmount, setRepayAmount] = useState("")
+  
+  // Wagmi hooks
+  const { address, isConnected } = useAccount()
+  const { data: hash, isPending, writeContract } = useWriteContract()
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = 
+    useWaitForTransactionReceipt({ hash })
+
+  // Get loan data from contract
+  const { data: borrowerData } = useReadContract({
+    address: myLoanContract.address,
+    abi: myLoanContract.abi,
+    functionName: 'borrower',
+  })
+  
+  const { data: repaymentAmountData } = useReadContract({
+    address: myLoanContract.address,
+    abi: myLoanContract.abi,
+    functionName: 'repaymentAmount',
+  })
+  
+  const { data: balanceData } = useReadContract({
+    address: myLoanContract.address,
+    abi: myLoanContract.abi,
+    functionName: 'getBalance',
+  })
+  
+  // Format loan details
+  const loanDetails = {
+    borrower: borrowerData ? String(borrowerData) : "",
+    repaymentAmount: repaymentAmountData ? ethers.formatEther(repaymentAmountData.toString()) : "0",
+    balance: balanceData ? ethers.formatEther(balanceData.toString()) : "0"
+  }
+
+  // Check if current user is the borrower
+  const isBorrower = () => {
+    return address?.toLowerCase() === loanDetails.borrower.toLowerCase()
+  }
+
+  // Repay loan
+  const repayLoan = () => {
+    if (!repayAmount) {
+      setError("Please enter an amount to repay")
+      return
+    }
+
+    try {
+      setError("")
+      writeContract({
+        address: myLoanContract.address,
+        abi: myLoanContract.abi,
+        functionName: 'repayLoan',
+        value: ethers.parseUnits(repayAmount, 18)
+      })
+      
+      if (isConfirmed) {
+        setRepayAmount("")
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to repay loan")
+    }
+  }
+
+  // Withdraw loan (borrower only)
+  const withdrawLoan = () => {
+    try {
+      setError("")
+      writeContract({
+        address: myLoanContract.address,
+        abi: myLoanContract.abi,
+        functionName: 'withdrawLoan',
+      })
+    } catch (err: any) {
+      setError(err.message || "Failed to withdraw loan")
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-3">
@@ -45,11 +138,47 @@ export default function OperatorDashboard() {
         <StatCard title="Monthly Revenue" value="$16,000" description="+5.3% from projected" delay={0.2} />
       </div>
 
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="mb-6"
+      >
+        <Card className="border border-[#4f1964]/20">
+          <CardHeader className="bg-[#4f1964]/5">
+            <CardTitle>Loan Management</CardTitle>
+            <CardDescription>Search and manage your EV loans</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <div className="p-4 bg-[#fbdc3e]/5 rounded-md border border-[#fbdc3e]/20 mb-4">
+              <h3 className="text-lg font-semibold mb-2 text-[#4f1964]">Loan Overview</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="mb-2 text-[#4f1964]">
+                  <strong>Active Loans:</strong> 2
+                </div>
+                <div className="mb-2 text-[#4f1964]">
+                  <strong>Total Outstanding:</strong> $58,640
+                </div>
+              </div>
+            </div>
+
+            <Button 
+              className="w-full bg-[#4f1964] hover:bg-[#3b1149] text-[#fbdc3e] font-medium border border-[#fbdc3e]/20"
+              asChild
+            >
+              <a href="/dashboard/operator/loan-management">
+                Go to Loan Management
+              </a>
+            </Button>
+          </CardContent>
+        </Card>
+      </motion.div>
+
       <div className="grid gap-6 md:grid-cols-2">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
           <Card>
             <CardHeader>
@@ -75,7 +204,7 @@ export default function OperatorDashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
         >
           <Card>
             <CardHeader>
@@ -104,7 +233,7 @@ export default function OperatorDashboard() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
       >
         <Card>
           <CardHeader>

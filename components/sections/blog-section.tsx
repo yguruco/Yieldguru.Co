@@ -169,9 +169,9 @@ function BentoBlogCard({
 
 const blogPosts = [
   {
-    title: "The Future of EV Fleet Tokenization",
+    title: "The Future of Tokenized EV Loans",
     excerpt:
-      "How fractional ownership is redesigning commercial EV fleet financing and creating new investment opportunities.",
+      "How investing in tokenized EV loans is redesigning commercial EV financing and creating new investment opportunities.",
     imageSrc: "/images/ford-vehicle.jpeg",
     date: "May 15, 2023",
     readTime: "8 min read",
@@ -188,9 +188,9 @@ const blogPosts = [
     slug: "/blog/electric-bus-investments",
   },
   {
-    title: "Regulatory Landscape for Tokenized EV Assets",
+    title: "Regulatory Landscape for Tokenized EV Loans",
     excerpt:
-      "A comprehensive guide to navigating the evolving regulatory environment for blockchain-based vehicle investments.",
+      "A comprehensive guide to navigating the evolving regulatory environment for blockchain-based EV loan investments.",
     imageSrc: "/images/ford.jpeg",
     date: "April 10, 2023",
     readTime: "10 min read",

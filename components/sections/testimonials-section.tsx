@@ -115,17 +115,22 @@ const testimonials = [
       "Getting our electric buses funded used to take months. With YieldGuru, we closed our last round in under two weeks. It's a game-changer for transit expansion.",
     author: "Sarah Johnson",
     title: "Fleet Manager at MetroTransit",
+      "With YieldGuru we have been able to enter into a financing partnership to increase our electric vans fleet from 2 to 50 vans plying the Ruiru - Ruaka - Westlands routes, and more routes are opening up",
+    author: "Sam Kamau",
+    title: "CEO - Sony Classic Shuttles",
   },
   {
     quote:
-      "I started small, but now YieldGuru is a core part of my portfolio. Reliable returns, clear reporting — finally, something in Web3 that just works.",
-    author: "Michael Chen",
-    title: "Director at Green Investment Partners",
+      "This new investing platform is creating a massive opportunity to drive professionalism in the matatu industry, and our workers now have an easy transparent way they can actually easily own the matatus they operate on the road",
+    author: "Nyambura Githiga",
+    title: "Federation of Drivers and Conductors Kenya (FEDCO)",
   },
   {
     quote:
       "We've been tracking EV asset trends across Africa, and YieldGuru has one of the most actionable models for deploying capital transparently.",
     author: "Kelvin Johnsone",
+      "We are working with YieldGuru to launch the first National EV Buses Sacco in Kenya. We will enable our members transition 100% to electric buses, with cheaper financing alternatives",
+    author: "Bernard Odero",
     title: "Research & Strategy at Africa Insights",
   },
   {
