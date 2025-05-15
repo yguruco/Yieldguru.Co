@@ -1,6 +1,6 @@
 "use client"
 
-import LoanComponent from "@/components/LoanComponent"
+import ViewInvest from "@/app/dashboard/investCard/viewinvest"
 
 export default function LoanManagementPage() {
   return (
@@ -13,7 +13,7 @@ export default function LoanManagementPage() {
       </div>
       
       <div className="mt-4">
-        <LoanComponent />
+        <ViewInvest />
       </div>
     </div>
   )

@@ -23,7 +23,7 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Check, AlertTriangle } from "lucide-react"
 import { ethers } from "ethers"
-import { LoanContractAddress, LoanContractABI } from "@/contractsAbi/LoanContractABI"
+import ViewInvest from "@/app/dashboard/investCard/viewinvest"
 import { 
   useAccount,
   useReadContract,
@@ -62,73 +62,73 @@ export default function OperatorDashboard() {
     useWaitForTransactionReceipt({ hash })
 
   // Get loan data from contract
-  const { data: borrowerData } = useReadContract({
-    address:LoanContractAddress,
-    abi: LoanContractABI,
-    functionName: 'borrower',
-  })
+  // const { data: borrowerData } = useReadContract({
+  //   address:LoanContractAddress,
+  //   abi: LoanContractABI,
+  //   functionName: 'borrower',
+  // })
   
-  const { data: repaymentAmountData } = useReadContract({
-    address:LoanContractAddress,
-    abi: LoanContractABI,
-    functionName: 'repaymentAmount',
-  })
+  // const { data: repaymentAmountData } = useReadContract({
+  //   address:LoanContractAddress,
+  //   abi: LoanContractABI,
+  //   functionName: 'repaymentAmount',
+  // })
   
-  const { data: balanceData } = useReadContract({
-    address:LoanContractAddress,
-    abi: LoanContractABI,
-    functionName: 'getBalance',
-  })
+  // const { data: balanceData } = useReadContract({
+  //   address:LoanContractAddress,
+  //   abi: LoanContractABI,
+  //   functionName: 'getBalance',
+  // })
   
   // Format loan details
-  const loanDetails = {
-    borrower: borrowerData ? String(borrowerData) : "",
-    repaymentAmount: repaymentAmountData ? ethers.formatEther(repaymentAmountData.toString()) : "0",
-    balance: balanceData ? ethers.formatEther(balanceData.toString()) : "0"
-  }
+  // const loanDetails = {
+  //   borrower: borrowerData ? String(borrowerData) : "",
+  //   repaymentAmount: repaymentAmountData ? ethers.formatEther(repaymentAmountData.toString()) : "0",
+  //   balance: balanceData ? ethers.formatEther(balanceData.toString()) : "0"
+  // }
 
-  // Check if current user is the borrower
-  const isBorrower = () => {
-    return address?.toLowerCase() === loanDetails.borrower.toLowerCase()
-  }
+  // // Check if current user is the borrower
+  // const isBorrower = () => {
+  //   return address?.toLowerCase() === loanDetails.borrower.toLowerCase()
+  // }
 
-  // Repay loan
-  const repayLoan = () => {
-    if (!repayAmount) {
-      setError("Please enter an amount to repay")
-      return
-    }
+  // // Repay loan
+  // const repayLoan = () => {
+  //   if (!repayAmount) {
+  //     setError("Please enter an amount to repay")
+  //     return
+  //   }
 
-    try {
-      setError("")
-      writeContract({
-        address:LoanContractAddress,
-        abi: LoanContractABI,
-        functionName: 'repayLoan',
-        value: ethers.parseUnits(repayAmount, 18)
-      })
+  //   try {
+  //     setError("")
+  //     writeContract({
+  //       address:LoanContractAddress,
+  //       abi: LoanContractABI,
+  //       functionName: 'repayLoan',
+  //       value: ethers.parseUnits(repayAmount, 18)
+  //     })
       
-      if (isConfirmed) {
-        setRepayAmount("")
-      }
-    } catch (err: any) {
-      setError(err.message || "Failed to repay loan")
-    }
-  }
+  //     if (isConfirmed) {
+  //       setRepayAmount("")
+  //     }
+  //   } catch (err: any) {
+  //     setError(err.message || "Failed to repay loan")
+  //   }
+  // }
 
-  // Withdraw loan (borrower only)
-  const withdrawLoan = () => {
-    try {
-      setError("")
-      writeContract({
-        address:LoanContractAddress,
-        abi: LoanContractABI,
-        functionName: 'withdrawLoan',
-      })
-    } catch (err: any) {
-      setError(err.message || "Failed to withdraw loan")
-    }
-  }
+  // // Withdraw loan (borrower only)
+  // const withdrawLoan = () => {
+  //   try {
+  //     setError("")
+  //     writeContract({
+  //       address:LoanContractAddress,
+  //       abi: LoanContractABI,
+  //       functionName: 'withdrawLoan',
+  //     })
+  //   } catch (err: any) {
+  //     setError(err.message || "Failed to withdraw loan")
+  //   }
+  // }
 
   return (
     <div className="space-y-6">

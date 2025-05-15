@@ -17,7 +17,7 @@ import { createConfig, http } from 'wagmi';
 //   blockExplorers: {
 //     default: {
 //       name: 'Etherscan',
-//       url: 'https://sepolia.etherscan.io'
+//       url: 'https://.io'
 //     }
 //   },
 //   testnet: true

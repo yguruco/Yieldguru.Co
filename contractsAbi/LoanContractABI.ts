@@ -238,6 +238,5 @@ export const LoanContractABI =  [
           "stateMutability": "nonpayable",
           "type": "function"
         }
-      ] as const
-    export const  LoanContractAddress = "0xFD2CbCBCC2dC05E4FBd74fFdCe649a301918EEEC";
+      ] as const;
   

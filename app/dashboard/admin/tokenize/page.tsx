@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import LoanComponent from "@/components/LoanComponent"
+import ViewInvest from "@/app/dashboard/investCard/viewinvest"
 
 export default function TokenizePage() {
   return (
@@ -24,7 +24,7 @@ export default function TokenizePage() {
           <div className="space-y-8">
             <div>
               <h3 className="text-lg font-semibold mb-4">Loan Component</h3>
-              <LoanComponent />
+              <ViewInvest/>
             </div>
           </div>
         </CardContent>
