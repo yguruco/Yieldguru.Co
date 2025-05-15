@@ -32,7 +32,7 @@ export function DashboardLayout({ children, dashboardType: propsDashboardType, a
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden p-3">
       {/* Animated background */}
       <DashboardBackground accentColor={accentColor} />
 
@@ -46,7 +46,7 @@ export function DashboardLayout({ children, dashboardType: propsDashboardType, a
       />
 
       {/* Dashboard content */}
-      <div className="flex w-full relative z-10">
+      <div className="flex w-full relative z-10 rounded-xl overflow-hidden shadow-xl">
         {/* Sidebar with higher z-index to ensure it's clickable */}
         <div className="relative z-20">
           <DashboardSidebar isOpen={isSidebarOpen} dashboardType={dashboardType} accentColor={accentColor} />

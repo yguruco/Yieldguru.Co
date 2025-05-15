@@ -12,7 +12,7 @@ export function generateStaticParams() {
 }
 
 // Define the page component
-export default function DashboardPage(props: { params: { type: string } }) {
+export default async function DashboardPage(props: { params: { type: string } }) {
   // Get the dashboard type from the URL params
   const type = props.params.type
 

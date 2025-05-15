@@ -30,7 +30,7 @@ export function DashboardHeader({ dashboardType, accentColor, toggleSidebar }: D
 
   return (
     <header
-      className="flex h-16 items-center justify-between px-4 backdrop-blur-sm bg-white/90 relative"
+      className="flex h-16 items-center justify-between px-4 backdrop-blur-sm bg-white/90 relative rounded-tr-xl"
       style={{
         boxShadow: `0 4px 20px rgba(0, 0, 0, 0.05), 0 1px 0 rgba(0, 0, 0, 0.05)`
       }}

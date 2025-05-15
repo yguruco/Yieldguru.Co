@@ -1,11 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { LineChart, BarChart, PieChart } from "lucide-react"
+import { motion } from "framer-motion"
+import { LineChart, BarChart, PieChart, Wallet } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
+import GlassmorphicCard from "@/components/dashboard/glassmorphic-card"
+import { ChartPlaceholder } from "@/components/dashboard/chart-placeholder"
 
 interface InvestedLoan {
   id: string
@@ -33,21 +36,21 @@ export default function InvestorPortfolioPage() {
   useEffect(() => {
     // Load investor's portfolio from localStorage
     const portfolioLoans = JSON.parse(localStorage.getItem("portfolioLoans") || "[]");
-    
+
     if (portfolioLoans.length > 0) {
       setInvestments(portfolioLoans);
-      
+
       // Calculate portfolio statistics
       const totalValue = portfolioLoans.reduce((sum: number, loan: InvestedLoan) => sum + loan.investedAmount, 0);
       const totalYield = portfolioLoans.reduce((sum: number, loan: InvestedLoan) => sum + (loan.yield * loan.investedAmount), 0);
       const averageYield = totalValue > 0 ? parseFloat((totalYield / totalValue).toFixed(2)) : 0;
-      
+
       // Calculate monthly income (based on yield)
       const monthlyIncome = portfolioLoans.reduce((sum: number, loan: InvestedLoan) => {
         const monthlyYield = loan.monthlyInterest || (loan.yield / 12);
         return sum + (loan.investedAmount * (monthlyYield / 100));
       }, 0);
-      
+
       setPortfolioStats({
         totalValue,
         averageYield,
@@ -56,6 +59,25 @@ export default function InvestorPortfolioPage() {
       });
     }
   }, []);
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  };
+
+  // Get accent color for investor dashboard
+  const accentColor = "#fbdc3e";
 
   return (
     <motion.div
@@ -205,9 +227,9 @@ export default function InvestorPortfolioPage() {
                         ${((investment.investedAmount * (investment.monthlyInterest || (investment.yield / 12)) / 100)).toFixed(2)} monthly
                       </span>
                     </div>
-                    <Progress 
-                      value={Math.min(100, (investment.investedAmount / investment.amount) * 100)} 
-                      className="h-2" 
+                    <Progress
+                      value={Math.min(100, (investment.investedAmount / investment.amount) * 100)}
+                      className="h-2"
                     />
                   </div>
                 </div>
@@ -216,6 +238,6 @@ export default function InvestorPortfolioPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   )
 }

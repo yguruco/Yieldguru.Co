@@ -30,7 +30,7 @@ export function DashboardSidebar({ isOpen, dashboardType, accentColor }: Dashboa
             animate={{ width: 280, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="hidden lg:block relative z-20 pointer-events-auto h-screen"
+            className="hidden lg:block relative z-20 pointer-events-auto h-screen rounded-l-xl"
             style={{
               background: 'rgba(255, 255, 255, 0.9)',
               backdropFilter: 'blur(10px)',
@@ -163,9 +163,9 @@ export function DashboardSidebar({ isOpen, dashboardType, accentColor }: Dashboa
                   </ul>
                 </div>
               </div>
-              
+
               {/* Wallet at the bottom of the sidebar */}
-              <div className="mt-auto pt-6 border-t border-gray-200 mt-6">
+              <div className="mt-auto pt-6 border-t border-gray-200 mt-6 relative z-[90]">
                 <ClientWallet />
               </div>
             </nav>
@@ -319,9 +319,9 @@ export function DashboardSidebar({ isOpen, dashboardType, accentColor }: Dashboa
                   </ul>
                 </div>
               </div>
-              
+
               {/* Wallet at the bottom of the mobile sidebar */}
-              <div className="mt-auto pt-6 border-t border-gray-200 mt-6">
+              <div className="mt-auto pt-6 border-t border-gray-200 mt-6 relative z-[90]">
                 <ClientWallet />
               </div>
             </nav>
