@@ -15,7 +15,7 @@ import { Check } from "lucide-react"
 import { motion } from "framer-motion"
 import { ApplicationLookup } from "@/components/rfl/application-lookup"
 import type { RFLSubmission } from "@/types/rfl"
-import { MintNFT } from "@/components/AdminNFT"
+// import { MintNFT } from "@/components/AdminNFT"
 import { CreateLoanForm } from "@/components/CreateLoanForm"
 // import { LoanEventsDisplay } from "@/components/LoanEventsDisplay"
 import ClientWallet from "@/components/onchainKit/ClientWallet"
@@ -332,17 +332,17 @@ export default function CreateLoanPage() {
 
                     <TabsContent value="blockchain" className="mt-6">
                       <div className="space-y-4">
-                        <Alert className="bg-blue-50 border-blue-200">
+                        {/* <Alert className="bg-blue-50 border-blue-200">
                           <Info className="h-4 w-4 text-blue-600" />
                           <AlertDescription className="text-blue-700">
                             Create a new loan directly on the blockchain. This will deploy a new loan smart contract.
                             <strong className="block mt-1">Important:</strong> Make sure your wallet is connected to <span className="font-semibold">Sepolia testnet</span> before creating a loan.
                           </AlertDescription>
-                        </Alert>
-                        
+                        </Alert> */}
+{/*                         
                         <div className="flex justify-center mb-4">
                           <ClientWallet />
-                        </div>
+                        </div> */}
                         
                         <div className="grid md:grid-cols-2 gap-8">
                           <div>
@@ -511,7 +511,7 @@ export default function CreateLoanPage() {
           </CardContent>
         </Card>
 
-        <Card className="mt-6">
+        {/* <Card className="mt-6">
           <CardHeader>
             <CardTitle>Mint NFT</CardTitle>
             <CardDescription>
@@ -521,7 +521,7 @@ export default function CreateLoanPage() {
           <CardContent>
             <MintNFT />
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   )
