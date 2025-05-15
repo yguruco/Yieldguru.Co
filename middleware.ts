@@ -50,6 +50,10 @@ export async function middleware(request: NextRequest) {
   try {
     // Verify the token
     console.log('Middleware: Verifying token with JWT_SECRET:', JWT_SECRET.substring(0, 5) + '...');
+    // Log the actual JWT_SECRET for debugging (only in development)
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Middleware: Full JWT_SECRET for debugging:', JWT_SECRET);
+    }
     const { payload } = await jwtVerify(
       token,
       new TextEncoder().encode(JWT_SECRET)

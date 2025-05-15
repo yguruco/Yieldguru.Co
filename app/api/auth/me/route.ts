@@ -24,61 +24,75 @@ export async function GET() {
     }
 
     console.log('API: Auth token found, verifying...');
+    console.log('API: JWT_SECRET prefix:', JWT_SECRET.substring(0, 5) + '...');
 
-    // Verify the token
-    const decoded = jwt.verify(token, JWT_SECRET) as {
-      userId: string;
-      email: string;
-      role: string;
-    };
-
-    console.log('API: Token verified, userId:', decoded.userId);
-
-    // Connect to the database
-    try {
-      await dbConnect();
-      console.log('API: Connected to MongoDB');
-    } catch (dbError) {
-      console.error('API: MongoDB connection error:', dbError);
-      return NextResponse.json(
-        { error: "Database connection failed" },
-        { status: 500 }
-      );
+    // Log the actual JWT_SECRET for debugging (only in development)
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('API: Full JWT_SECRET for debugging:', JWT_SECRET);
     }
 
-    // Get the user from the database (works for both admin and regular users)
+    // Verify the token
     try {
-      const user = await User.findById(decoded.userId).select('-password');
+      const decoded = jwt.verify(token, JWT_SECRET) as {
+        userId: string;
+        email: string;
+        role: string;
+      };
 
-      if (!user) {
-        console.log('API: User not found with ID:', decoded.userId);
-        // Clear the invalid cookie
-        const cookieStore = await cookies();
-        cookieStore.delete('auth_token');
+      console.log('API: Token verified, userId:', decoded.userId);
 
+      // Connect to the database
+      try {
+        await dbConnect();
+        console.log('API: Connected to MongoDB');
+      } catch (dbError) {
+        console.error('API: MongoDB connection error:', dbError);
         return NextResponse.json(
-          { error: "User not found" },
-          { status: 404 }
+          { error: "Database connection failed" },
+          { status: 500 }
         );
       }
 
-      console.log('API: User found:', user.name, user.email);
+      // Get the user from the database (works for both admin and regular users)
+      try {
+        const user = await User.findById(decoded.userId).select('-password');
 
-      return NextResponse.json({
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          status: user.status,
-          lastLogin: user.lastLogin
+        if (!user) {
+          console.log('API: User not found with ID:', decoded.userId);
+          // Clear the invalid cookie
+          const cookieStore = await cookies();
+          cookieStore.delete('auth_token');
+
+          return NextResponse.json(
+            { error: "User not found" },
+            { status: 404 }
+          );
         }
-      }, { status: 200 });
-    } catch (userError) {
-      console.error('API: Error finding user:', userError);
+
+        console.log('API: User found:', user.name, user.email);
+
+        return NextResponse.json({
+          user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            status: user.status,
+            lastLogin: user.lastLogin
+          }
+        }, { status: 200 });
+      } catch (userError) {
+        console.error('API: Error finding user:', userError);
+        return NextResponse.json(
+          { error: "Error retrieving user data" },
+          { status: 500 }
+        );
+      }
+    } catch (jwtError) {
+      console.error("JWT verification error:", jwtError);
       return NextResponse.json(
-        { error: "Error retrieving user data" },
-        { status: 500 }
+        { error: "Invalid token" },
+        { status: 401 }
       );
     }
   } catch (error) {

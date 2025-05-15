@@ -48,6 +48,13 @@ export async function POST(request: NextRequest) {
     await admin.save();
 
     // Create JWT token
+    console.log('Admin Login: Creating JWT token with JWT_SECRET prefix:', JWT_SECRET.substring(0, 5) + '...');
+
+    // Log the actual JWT_SECRET for debugging (only in development)
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Admin Login: Full JWT_SECRET for debugging:', JWT_SECRET);
+    }
+
     const token = jwt.sign(
       {
         userId: admin._id,
@@ -66,9 +73,10 @@ export async function POST(request: NextRequest) {
       value: token,
       httpOnly: true,
       path: '/',
-      secure: false, // Set to false for local development
+      // In production, secure should be true
+      secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24, // 24 hours
-      sameSite: 'lax' // Changed from 'strict' to 'lax' for better compatibility
+      sameSite: 'lax' // 'lax' for better compatibility
     });
 
     // Return admin data
