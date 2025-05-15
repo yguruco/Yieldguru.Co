@@ -48,25 +48,41 @@ export default function MarketplacePage() {
   const [isInvesting, setIsInvesting] = useState(false)
   const [investmentProgress, setInvestmentProgress] = useState(0)
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  };
+
   useEffect(() => {
     // Load admin-created loans from localStorage
     const adminLoans = JSON.parse(localStorage.getItem("adminLoans") || "[]");
-    
+
     // Transform admin loans into marketplace loans
     const marketplaceLoans = adminLoans.map((loan: Loan) => {
       // Calculate the annual yield (simple calculation based on monthly interest)
-      const yearlyYield = loan.monthlyInterest 
+      const yearlyYield = loan.monthlyInterest
         ? loan.monthlyInterest * 12
         : (((loan.repaymentAmount / loan.amount) - 1) * 100) / (loan.duration / 12);
-        
+
       // Randomize the available amount (70-95% of total)
       const availablePercentage = Math.random() * 25 + 70;
       const available = Math.round(loan.amount * (availablePercentage / 100));
-      
+
       // Set minimum investment at 1-5% of the loan amount
       const minPercentage = Math.random() * 4 + 1;
       const minInvestment = Math.round(loan.amount * (minPercentage / 100));
-      
+
       return {
         ...loan,
         yield: parseFloat(yearlyYield.toFixed(2)),
@@ -74,7 +90,7 @@ export default function MarketplacePage() {
         minInvestment: minInvestment,
       };
     });
-    
+
     if (marketplaceLoans.length > 0) {
       setLoans(marketplaceLoans);
       setFilteredLoans(marketplaceLoans);
@@ -122,7 +138,7 @@ export default function MarketplacePage() {
         result = result.filter((loan) => loan.amount > 500000)
       }
     }
-    
+
     // Apply status filter
     if (selectedStatus !== "All") {
       result = result.filter((loan) => loan.status === selectedStatus)
@@ -135,31 +151,31 @@ export default function MarketplacePage() {
     setSelectedInvestment(loanId)
     setInvestmentAmount("")
   }
-  
+
   const closeInvestmentModal = () => {
     setSelectedInvestment(null)
     setInvestmentAmount("")
   }
-  
+
   const handleSubmitInvestment = async () => {
     if (!selectedInvestment || !investmentAmount) return;
-    
+
     const amount = parseFloat(investmentAmount);
     const loan = loans.find(l => l.id === selectedInvestment);
-    
+
     if (!loan) return;
     if (amount < loan.minInvestment) return;
     if (amount > loan.available) return;
-    
+
     setIsInvesting(true);
     setInvestmentProgress(0);
-    
+
     // Simulate investment process
     for (let i = 1; i <= 5; i++) {
       await new Promise(resolve => setTimeout(resolve, 800));
       setInvestmentProgress(i * 20);
     }
-    
+
     // Update loan available amount
     const updatedLoans = loans.map(l => {
       if (l.id === selectedInvestment) {
@@ -171,14 +187,14 @@ export default function MarketplacePage() {
       }
       return l;
     });
-    
+
     setLoans(updatedLoans);
     setFilteredLoans(updatedLoans);
-    
+
     // Store updated portfolio in localStorage
     const portfolioLoans = JSON.parse(localStorage.getItem("portfolioLoans") || "[]");
     const existingLoanIndex = portfolioLoans.findIndex((p: any) => p.id === selectedInvestment);
-    
+
     if (existingLoanIndex >= 0) {
       portfolioLoans[existingLoanIndex].investedAmount += amount;
     } else {
@@ -189,9 +205,9 @@ export default function MarketplacePage() {
       };
       portfolioLoans.push(investedLoan);
     }
-    
+
     localStorage.setItem("portfolioLoans", JSON.stringify(portfolioLoans));
-    
+
     // Reset form
     setIsInvesting(false);
     setSelectedInvestment(null);
@@ -272,11 +288,11 @@ export default function MarketplacePage() {
               {filteredLoans.map((loan, index) => (
                 <Card key={loan.id} className="overflow-hidden h-full flex flex-col">
                   <div className="relative h-48">
-                    <Image 
-                      src={loan.image || "/placeholder.svg?height=200&width=300"} 
-                      alt={loan.name} 
-                      fill 
-                      className="object-cover" 
+                    <Image
+                      src={loan.image || "/placeholder.svg?height=200&width=300"}
+                      alt={loan.name}
+                      fill
+                      className="object-cover"
                     />
                     <div className="absolute top-2 right-2">
                       <Badge className={`${loan.status === "Active" ? "bg-green-500" : "bg-yellow-500"}`}>
@@ -312,7 +328,7 @@ export default function MarketplacePage() {
                         <p className="font-bold">${loan.minInvestment.toLocaleString()}</p>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-3">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500">Operator:</span>
@@ -335,7 +351,7 @@ export default function MarketplacePage() {
                     </div>
                   </CardContent>
                   <div className="p-4 pt-0 mt-auto">
-                    <Button 
+                    <Button
                       className="w-full bg-[#fbdc3e] text-black hover:bg-[#fbdc3e]/90"
                       onClick={() => handleInvest(loan.id)}
                       disabled={loan.available < loan.minInvestment}
@@ -347,7 +363,7 @@ export default function MarketplacePage() {
               ))}
             </div>
           )}
-          
+
           {selectedInvestment && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
               <Card className="w-full max-w-md">
@@ -382,14 +398,14 @@ export default function MarketplacePage() {
                             </div>
                           </div>
                         </div>
-                        
+
                         <Alert className="bg-blue-50 border-blue-200">
                           <InfoIcon className="h-4 w-4 text-blue-600" />
                           <AlertDescription className="text-blue-700">
                             Annual yield: {loans.find(l => l.id === selectedInvestment)?.yield}%
                           </AlertDescription>
                         </Alert>
-                        
+
                         <div className="space-y-2">
                           <Label htmlFor="investment-amount">Investment Amount ($)</Label>
                           <Input
@@ -401,7 +417,7 @@ export default function MarketplacePage() {
                           />
                         </div>
                       </div>
-                      
+
                       <div className="flex gap-4">
                         <Button
                           variant="outline"
@@ -414,7 +430,7 @@ export default function MarketplacePage() {
                           className="flex-1 bg-[#fbdc3e] text-black hover:bg-[#fbdc3e]/90"
                           onClick={handleSubmitInvestment}
                           disabled={
-                            !investmentAmount || 
+                            !investmentAmount ||
                             parseFloat(investmentAmount) < (loans.find(l => l.id === selectedInvestment)?.minInvestment || 0) ||
                             parseFloat(investmentAmount) > (loans.find(l => l.id === selectedInvestment)?.available || 0)
                           }
@@ -430,23 +446,23 @@ export default function MarketplacePage() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   )
 }
 
 // Convert default loans to marketplace format
 function convertDefaultLoansToMarketplace(defaultLoans: Loan[]): MarketplaceLoan[] {
   return defaultLoans.map(loan => {
-    const yearlyYield = loan.monthlyInterest 
+    const yearlyYield = loan.monthlyInterest
       ? loan.monthlyInterest * 12
       : (((loan.repaymentAmount / loan.amount) - 1) * 100) / (loan.duration / 12);
-      
+
     const availablePercentage = Math.random() * 25 + 70;
     const available = Math.round(loan.amount * (availablePercentage / 100));
-    
+
     const minPercentage = Math.random() * 4 + 1;
     const minInvestment = Math.round(loan.amount * (minPercentage / 100));
-    
+
     return {
       ...loan,
       yield: parseFloat(yearlyYield.toFixed(2)),
