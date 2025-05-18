@@ -1,8 +1,12 @@
-import { BarChart, LineChart, TrendingUp, Zap } from "lucide-react"
+"use client"
+import { BarChart, LineChart, TrendingUp, Zap, Battery, Route, DollarSign } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
+import { motion } from "framer-motion"
+import GlassmorphicCard from "@/components/dashboard/glassmorphic-card"
+import NeumorphicStatCard from "@/components/dashboard/neumorphic-stat-card"
 
 export default function OperatorPerformancePage() {
   return (
@@ -19,99 +23,122 @@ export default function OperatorPerformancePage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Energy Efficiency</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">92%</div>
-            <p className="text-xs text-muted-foreground">+4% from last month</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Daily Range</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">187 mi</div>
-            <p className="text-xs text-muted-foreground">+12 mi from last month</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Charging Efficiency</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">78%</div>
-            <p className="text-xs text-muted-foreground">+2% from last month</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Maintenance Cost</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$3,450</div>
-            <p className="text-xs text-muted-foreground">-8% from last month</p>
-          </CardContent>
-        </Card>
+        <NeumorphicStatCard
+          title="Energy Efficiency"
+          value="92%"
+          description="+4% from last month"
+          trend="up"
+          trendValue="4%"
+          icon={<Zap className="h-5 w-5 text-[#f68b27]" />}
+          delay={0}
+        />
+        <NeumorphicStatCard
+          title="Avg. Daily Range"
+          value="187 mi"
+          description="+12 mi from last month"
+          trend="up"
+          trendValue="12 mi"
+          icon={<Route className="h-5 w-5 text-[#f68b27]" />}
+          delay={0.1}
+        />
+        <NeumorphicStatCard
+          title="Charging Efficiency"
+          value="78%"
+          description="+2% from last month"
+          trend="up"
+          trendValue="2%"
+          icon={<Battery className="h-5 w-5 text-[#f68b27]" />}
+          delay={0.2}
+        />
+        <NeumorphicStatCard
+          title="Maintenance Cost"
+          value="$3,450"
+          description="-8% from last month"
+          trend="down"
+          trendValue="8%"
+          icon={<DollarSign className="h-5 w-5 text-[#f68b27]" />}
+          delay={0.3}
+        />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Fleet Utilization</CardTitle>
-            <CardDescription>Daily utilization percentage</CardDescription>
-          </CardHeader>
-          <CardContent className="flex h-80 items-center justify-center">
-            <div className="flex h-64 w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 text-center">
+        <GlassmorphicCard
+          title="Fleet Utilization"
+          description="Daily utilization percentage"
+          delay={0.4}
+        >
+          <div className="flex h-80 items-center justify-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="flex h-64 w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-white/50 text-center"
+            >
               <BarChart className="mb-2 h-8 w-8 text-[#f68b27]" />
               <div className="text-2xl font-bold">Utilization Chart</div>
               <div className="text-sm text-muted-foreground">Interactive chart in production</div>
-            </div>
-          </CardContent>
-        </Card>
+            </motion.div>
+          </div>
+        </GlassmorphicCard>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Revenue Performance</CardTitle>
-            <CardDescription>Actual vs projected revenue</CardDescription>
-          </CardHeader>
-          <CardContent className="flex h-80 items-center justify-center">
-            <div className="flex h-64 w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 text-center">
+        <GlassmorphicCard
+          title="Revenue Performance"
+          description="Actual vs projected revenue"
+          delay={0.5}
+        >
+          <div className="flex h-80 items-center justify-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="flex h-64 w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-white/50 text-center"
+            >
               <LineChart className="mb-2 h-8 w-8 text-[#f68b27]" />
               <div className="text-2xl font-bold">Revenue Chart</div>
               <div className="text-sm text-muted-foreground">Interactive chart in production</div>
-            </div>
-          </CardContent>
-        </Card>
+            </motion.div>
+          </div>
+        </GlassmorphicCard>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Energy Consumption</CardTitle>
-          <CardDescription>Vehicle energy efficiency metrics</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {energyData.map((item) => (
-              <div key={item.id} className="rounded-lg border p-4">
+      <GlassmorphicCard
+        title="Energy Consumption"
+        description="Vehicle energy efficiency metrics"
+        delay={0.6}
+      >
+        <div className="space-y-4 py-2">
+          {energyData.map((item, index) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 * index }}
+              whileHover={{ y: -3, transition: { duration: 0.2 } }}
+              className="group"
+            >
+              <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all duration-300 hover:shadow-md">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100">
+                        <Zap className="h-4 w-4 text-[#f68b27]" />
+                      </div>
                       <h3 className="font-medium">{item.id}</h3>
-                      <Badge variant="outline">{item.type}</Badge>
+                      <Badge variant="outline" className="bg-gray-50">
+                        {item.type}
+                      </Badge>
                     </div>
-                    <div className="mt-1 text-sm text-muted-foreground">
-                      Driver: {item.driver} • Last Trip: {item.lastTrip}
+                    <div className="mt-2 flex flex-col gap-1 text-sm text-gray-500 sm:flex-row sm:gap-4">
+                      <span>Driver: {item.driver}</span>
+                      <span>Last Trip: {item.lastTrip}</span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="flex items-center gap-1 text-lg font-bold">
-                      <Zap className="h-4 w-4 text-[#f68b27]" />
+                    <div className="flex items-center gap-1 text-lg font-bold text-[#f68b27]">
+                      <Zap className="h-4 w-4" />
                       {item.kwhPerMile} kWh/mile
                     </div>
-                    <div className="text-sm text-muted-foreground">{item.efficiency}% efficiency</div>
+                    <div className="text-sm text-gray-500">{item.efficiency}% efficiency</div>
                   </div>
                 </div>
                 <div className="mt-4">
@@ -119,13 +146,16 @@ export default function OperatorPerformancePage() {
                     <span>Energy Efficiency</span>
                     <span className="font-medium">{item.efficiency}%</span>
                   </div>
-                  <Progress value={item.efficiency} className="h-2" />
+                  <div className="relative">
+                    <Progress value={item.efficiency} className={`h-2 ${item.efficiency > 90 ? "bg-green-500" : item.efficiency > 80 ? "bg-yellow-500" : "bg-orange-500"}`} />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 shimmer"></div>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </motion.div>
+          ))}
+        </div>
+      </GlassmorphicCard>
     </div>
   )
 }

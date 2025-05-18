@@ -206,7 +206,7 @@ export default function MarketplacePage() {
           <h1 className="text-3xl font-bold tracking-tight">Marketplace</h1>
           <p className="text-muted-foreground">Browse and invest in tokenized EV loans</p>
         </div>
-      </div>
+      </motion.div>
 
       <Card>
         <CardHeader>
@@ -268,11 +268,11 @@ export default function MarketplacePage() {
               {filteredLoans.map((loan, index) => (
                 <Card key={loan.id} className="overflow-hidden h-full flex flex-col">
                   <div className="relative h-48">
-                    <Image 
-                      src={loan.image || "/placeholder.svg?height=200&width=300"} 
-                      alt={loan.name} 
-                      fill 
-                      className="object-cover" 
+                    <Image
+                      src={loan.image || "/placeholder.svg?height=200&width=300"}
+                      alt={loan.name}
+                      fill
+                      className="object-cover"
                     />
                     <div className="absolute top-2 right-2">
                       <Badge className={`${loan.status === "Active" ? "bg-green-500" : "bg-yellow-500"}`}>
@@ -308,7 +308,7 @@ export default function MarketplacePage() {
                         <p className="font-bold">${loan.minInvestment.toLocaleString()}</p>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-3">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500">Operator:</span>
@@ -331,7 +331,7 @@ export default function MarketplacePage() {
                     </div>
                   </CardContent>
                   <div className="p-4 pt-0 mt-auto">
-                    <Button 
+                    <Button
                       className="w-full bg-[#fbdc3e] text-black hover:bg-[#fbdc3e]/90"
                       onClick={() => handleInvest(loan.id)}
                       disabled={loan.available < loan.minInvestment}
@@ -343,7 +343,7 @@ export default function MarketplacePage() {
               ))}
             </div>
           )}
-          
+
           {selectedInvestment && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
               <Card className="w-full max-w-md">
@@ -378,14 +378,14 @@ export default function MarketplacePage() {
                             </div>
                           </div>
                         </div>
-                        
+
                         <Alert className="bg-blue-50 border-blue-200">
                           <InfoIcon className="h-4 w-4 text-blue-600" />
                           <AlertDescription className="text-blue-700">
                             Annual yield: {loans.find(l => l.id === selectedInvestment)?.yield}%
                           </AlertDescription>
                         </Alert>
-                        
+
                         <div className="space-y-2">
                           <Label htmlFor="investment-amount">Investment Amount ($)</Label>
                           <Input
@@ -397,7 +397,7 @@ export default function MarketplacePage() {
                           />
                         </div>
                       </div>
-                      
+
                       <div className="flex gap-4">
                         <Button
                           variant="outline"
@@ -410,7 +410,7 @@ export default function MarketplacePage() {
                           className="flex-1 bg-[#fbdc3e] text-black hover:bg-[#fbdc3e]/90"
                           onClick={handleSubmitInvestment}
                           disabled={
-                            !investmentAmount || 
+                            !investmentAmount ||
                             parseFloat(investmentAmount) < (loans.find(l => l.id === selectedInvestment)?.minInvestment || 0) ||
                             parseFloat(investmentAmount) > (loans.find(l => l.id === selectedInvestment)?.available || 0)
                           }

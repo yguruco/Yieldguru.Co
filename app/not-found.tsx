@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowLeft, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -6,6 +7,16 @@ export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
       <div className="mx-auto max-w-md px-4 text-center">
+        <div className="mb-4 flex justify-center">
+          <div className="relative h-16 w-16 overflow-hidden">
+            <Image
+              src="/images/YG LOGO.png"
+              alt="YieldGuru Logo"
+              fill
+              className="object-contain"
+            />
+          </div>
+        </div>
         <div className="mb-8 flex justify-center">
           <div className="rounded-full bg-[#4f1964]/10 p-3">
             <div className="rounded-full bg-[#4f1964]/20 p-4">

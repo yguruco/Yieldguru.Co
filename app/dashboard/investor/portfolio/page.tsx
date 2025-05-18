@@ -1,11 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { LineChart, BarChart, PieChart } from "lucide-react"
+import { motion } from "framer-motion"
+import { LineChart, BarChart, PieChart, Wallet } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
+import GlassmorphicCard from "@/components/dashboard/glassmorphic-card"
+import { ChartPlaceholder } from "@/components/dashboard/chart-placeholder"
 
 interface InvestedLoan {
   id: string
@@ -33,21 +36,21 @@ export default function InvestorPortfolioPage() {
   useEffect(() => {
     // Load investor's portfolio from localStorage
     const portfolioLoans = JSON.parse(localStorage.getItem("portfolioLoans") || "[]");
-    
+
     if (portfolioLoans.length > 0) {
       setInvestments(portfolioLoans);
-      
+
       // Calculate portfolio statistics
       const totalValue = portfolioLoans.reduce((sum: number, loan: InvestedLoan) => sum + loan.investedAmount, 0);
       const totalYield = portfolioLoans.reduce((sum: number, loan: InvestedLoan) => sum + (loan.yield * loan.investedAmount), 0);
       const averageYield = totalValue > 0 ? parseFloat((totalYield / totalValue).toFixed(2)) : 0;
-      
+
       // Calculate monthly income (based on yield)
       const monthlyIncome = portfolioLoans.reduce((sum: number, loan: InvestedLoan) => {
         const monthlyYield = loan.monthlyInterest || (loan.yield / 12);
         return sum + (loan.investedAmount * (monthlyYield / 100));
       }, 0);
-      
+
       setPortfolioStats({
         totalValue,
         averageYield,
@@ -57,18 +60,53 @@ export default function InvestorPortfolioPage() {
     }
   }, []);
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  };
+
+  // Get accent color for investor dashboard
+  const accentColor = "#fbdc3e";
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <motion.div
+      className="space-y-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div variants={itemVariants} className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">My Portfolio</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <div
+              className="flex h-10 w-10 items-center justify-center rounded-xl"
+              style={{
+                background: `linear-gradient(135deg, ${accentColor}, ${accentColor}80)`,
+                boxShadow: `0 3px 10px ${accentColor}40`
+              }}
+            >
+              <Wallet className="h-5 w-5 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight shimmer">My Portfolio</h1>
+          </div>
           <p className="text-muted-foreground">Track and manage your EV asset investments</p>
         </div>
         <Button className="bg-[#fbdc3e] text-[#4f1964] hover:bg-[#fbdc3e]/90">
           <PieChart className="mr-2 h-4 w-4" />
           Portfolio Analysis
         </Button>
-      </div>
+      </motion.div>
 
       <div className="grid gap-6 md:grid-cols-4">
         <Card>
@@ -110,33 +148,37 @@ export default function InvestorPortfolioPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Portfolio Allocation</CardTitle>
-            <CardDescription>Distribution by asset type</CardDescription>
-          </CardHeader>
-          <CardContent className="flex h-80 items-center justify-center">
-            <div className="flex h-64 w-64 flex-col items-center justify-center rounded-full border-8 border-[#fbdc3e] text-center">
-              <LineChart className="mb-2 h-8 w-8 text-[#4f1964]" />
-              <div className="text-2xl font-bold">Asset Allocation</div>
-              <div className="text-sm text-muted-foreground">Interactive chart in production</div>
-            </div>
-          </CardContent>
-        </Card>
+        <motion.div variants={itemVariants}>
+          <GlassmorphicCard
+            title="Portfolio Allocation"
+            description="Distribution by asset type"
+            accentColor={accentColor}
+          >
+            <ChartPlaceholder
+              height={300}
+              type="pie"
+              title="Asset Allocation"
+              description="Breakdown by vehicle type"
+              accentColor={accentColor}
+            />
+          </GlassmorphicCard>
+        </motion.div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Performance History</CardTitle>
-            <CardDescription>Monthly returns over time</CardDescription>
-          </CardHeader>
-          <CardContent className="flex h-80 items-center justify-center">
-            <div className="flex h-64 w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 text-center">
-              <BarChart className="mb-2 h-8 w-8 text-[#4f1964]" />
-              <div className="text-2xl font-bold">Performance Chart</div>
-              <div className="text-sm text-muted-foreground">Interactive chart in production</div>
-            </div>
-          </CardContent>
-        </Card>
+        <motion.div variants={itemVariants}>
+          <GlassmorphicCard
+            title="Performance History"
+            description="Monthly returns over time"
+            accentColor={accentColor}
+          >
+            <ChartPlaceholder
+              height={300}
+              type="bar"
+              title="Performance Chart"
+              description="Monthly returns"
+              accentColor={accentColor}
+            />
+          </GlassmorphicCard>
+        </motion.div>
       </div>
 
       <Card>
@@ -185,9 +227,9 @@ export default function InvestorPortfolioPage() {
                         ${((investment.investedAmount * (investment.monthlyInterest || (investment.yield / 12)) / 100)).toFixed(2)} monthly
                       </span>
                     </div>
-                    <Progress 
-                      value={Math.min(100, (investment.investedAmount / investment.amount) * 100)} 
-                      className="h-2" 
+                    <Progress
+                      value={Math.min(100, (investment.investedAmount / investment.amount) * 100)}
+                      className="h-2"
                     />
                   </div>
                 </div>
@@ -196,6 +238,6 @@ export default function InvestorPortfolioPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   )
 }

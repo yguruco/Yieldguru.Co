@@ -34,7 +34,7 @@ export function WalletComponents() {
                 </ConnectWallet>
 
                 {/* Dropdown menu styling */}
-                <WalletDropdown className="bg-[#4f1964]/95 border border-[#fbdc3e]/30 rounded-xl shadow-lg overflow-hidden">
+                <WalletDropdown className="bg-[#4f1964]/95 border border-[#fbdc3e]/30 rounded-xl shadow-lg overflow-hidden relative z-[100]">
                     {/* User identity section */}
                     <Identity
                         className="px-4 pt-4 pb-3 border-b border-[#fbdc3e]/20"
@@ -49,7 +49,7 @@ export function WalletComponents() {
                         </div>
                         <EthBalance className="text-[#fbdc3e] font-medium text-lg" />
                     </Identity>
-                    
+
                     {/* Menu items with consistent styling */}
                     <div className="p-2">
                         <WalletDropdownBasename className="px-3 py-2 text-white hover:bg-[#3b1149] rounded-lg transition-colors duration-200" />

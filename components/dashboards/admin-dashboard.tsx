@@ -5,6 +5,22 @@ import { ArrowUpRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function AdminDashboard() {
+  // Animation variants for staggered animations
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  }
+
   return (
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-3">

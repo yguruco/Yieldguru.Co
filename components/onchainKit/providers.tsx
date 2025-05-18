@@ -19,8 +19,8 @@ export function Providers({ children }: { children: ReactNode }) {
         },
         wallet: {
           display: 'modal', // 📱 enable the modal ie other wallets
-          termsUrl: 'https://yieldguru.network/', 
-          privacyUrl: 'https://yieldguru.network/', 
+          termsUrl: 'https://yieldguru.network/',
+          privacyUrl: 'https://yieldguru.network/',
         },
       }}
     >
