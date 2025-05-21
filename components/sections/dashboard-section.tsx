@@ -17,22 +17,22 @@ export default function DashboardSection() {
   const y = useTransform(scrollYProgress, [0, 1], [50, -50])
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
   return (
-    <section ref={sectionRef} className="relative bg-white py-24" id="features">
+    <section ref={sectionRef} className="relative bg-white py-2 pb-0" id="features">
       {/* Decorative elements */}
       <div className="absolute left-0 top-0 h-24 w-full bg-gradient-to-b from-white/50 to-transparent"></div>
       <div className="absolute -left-16 top-40 h-64 w-64 rounded-full bg-[#4f1964]/5 blur-3xl"></div>
       <div className="absolute -right-16 top-80 h-64 w-64 rounded-full bg-[#fbdc3e]/5 blur-3xl"></div>
 
-      <div className="container mx-auto max-w-6xl px-8 sm:px-10 lg:px-12">
+      <div className="container mx-auto max-w-6xl px-8 pb-0 sm:px-10 lg:px-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
           viewport={{ once: true }}
-          className="mx-auto mb-16 max-w-3xl text-center"
+          className="mx-auto mb-8 max-w-3xl text-center"
         >
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Three Powerful Dashboards for Complete <br/>
+            Two Powerful Dashboards for Complete <br/>
             <span className="relative inline-block h-[40px] overflow-hidden sm:h-[50px]">
               <span className="animate-scroll-text absolute left-0 flex flex-col">
                 <span className="text-[#4f1964]">EV Asset Management</span>
@@ -49,8 +49,8 @@ export default function DashboardSection() {
 
         <motion.div
           style={{ opacity }}
-          className="grid grid-cols-1 gap-8 md:grid-cols-4 md:grid-rows-3">
-          {/* Admin Dashboard - Large Card */}
+          className="grid grid-cols-1 gap-2 md:grid-cols-4 md:grid-rows-3">
+          {/* Operator Dashboard - Large Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -60,15 +60,14 @@ export default function DashboardSection() {
             className="md:col-span-2 md:row-span-2"
           >
             <DashboardCard
-              title="Admin Dashboard"
-              description="Comprehensive platform management with asset oversight, user administration, and performance analytics. Monitor all aspects of your EV tokenization platform in real-time."
-              icon={Shield}
-              color="#4f1964"
-              size="large"
+              title="EV-Operator Dashboard"
+              description="Monitor vehicle performance, optimize operations, and maximize the value of your EV fleet."
+              icon={Truck}
+              color="#f68b27"
+              size="medium"
               features={[
-                { icon: Users, text: "User Management" },
-                { icon: BarChart3, text: "Performance Analytics" },
-                { icon: Settings, text: "Platform Configuration" }
+                { icon: Zap, text: "Fleet Monitoring" },
+                { icon: BarChart3, text: "Efficiency Analytics" }
               ]}
             />
           </motion.div>
@@ -125,40 +124,18 @@ export default function DashboardSection() {
               color="#fbdc3e"
             />
           </motion.div>
-
-          {/* Operator Dashboard - Medium Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            viewport={{ once: true }}
-            whileHover={{ y: -5 }}
-            className="md:col-span-2 md:row-span-1"
-          >
-            <DashboardCard
-              title="EV-Operator Dashboard"
-              description="Monitor vehicle performance, optimize operations, and maximize the value of your EV fleet."
-              icon={Truck}
-              color="#f68b27"
-              size="medium"
-              features={[
-                { icon: Zap, text: "Fleet Monitoring" },
-                { icon: BarChart3, text: "Efficiency Analytics" }
-              ]}
-            />
-          </motion.div>
         </motion.div>
       </div>
       {/* Simple section divider */}
-      <div className="relative mt-20 flex justify-center">
-        <div className="relative h-16 w-full max-w-3xl">
+      <div className="relative mt-0 flex justify-center">
+        <div className="relative h-1 w-full max-w-3xl">
           {/* Center line */}
-          <div className="absolute left-1/2 top-1/2 h-[2px] w-full -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+          <div className="absolute left-1/2 top-1/2 h-[1px] w-full -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
 
           {/* Brand color dots */}
-          <div className="floating-dot-1 absolute left-1/4 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[#4f1964] opacity-80"></div>
-          <div className="floating-dot-2 absolute left-1/2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[#fbdc3e] opacity-80"></div>
-          <div className="floating-dot-3 absolute left-3/4 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[#f68b27] opacity-80"></div>
+          <div className="floating-dot-1 absolute left-1/4 top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-[#4f1964] opacity-70"></div>
+          <div className="floating-dot-2 absolute left-1/2 top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-[#fbdc3e] opacity-70"></div>
+          <div className="floating-dot-3 absolute left-3/4 top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-[#f68b27] opacity-70"></div>
         </div>
       </div>
     </section>
@@ -177,12 +154,12 @@ interface DashboardCardProps {
 function DashboardCard({ title, description, icon: Icon, color, size = "medium", features }: DashboardCardProps) {
   return (
     <Card className="group h-full overflow-hidden transition-all duration-300 hover:shadow-lg">
-      <CardContent className={`flex h-full flex-col p-6 ${size === "large" ? "pb-8" : ""}`}>
-        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg transition-transform duration-500 group-hover:rotate-12" style={{ backgroundColor: color }}>
+      <CardContent className={`flex h-full flex-col p-2 ${size === "large" ? "pb-2" : ""}`}>
+        <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg transition-transform duration-500 group-hover:rotate-12" style={{ backgroundColor: color }}>
           <Icon className="h-6 w-6 text-white" />
         </div>
         <h3 className="mb-2 text-xl font-bold">{title}</h3>
-        <p className={`${size === "large" ? "mb-6" : "mb-4"} flex-1 text-gray-600`}>{description}</p>
+        <p className={`${size === "large" ? "mb-3" : "mb-2"} flex-1 text-gray-600`}>{description}</p>
 
         {features && features.length > 0 && (
           <div className="mt-auto flex flex-wrap gap-3">
@@ -216,12 +193,12 @@ interface FeatureCardProps {
 function FeatureCard({ icon: Icon, title, color }: FeatureCardProps) {
   return (
     <Card className="group h-full transition-all duration-300 hover:shadow-lg">
-      <CardContent className="flex h-full flex-col items-center justify-center p-6 text-center">
+      <CardContent className="flex h-full flex-col items-center justify-center p-2 text-center">
         <div
-          className="mb-3 flex h-12 w-12 items-center justify-center rounded-full transition-all duration-500 group-hover:scale-110"
+          className="mb-1 flex h-10 w-10 items-center justify-center rounded-full transition-all duration-500 group-hover:scale-110"
           style={{ backgroundColor: `${color}20` }}
         >
-          <Icon className="h-6 w-6 transition-transform duration-500 group-hover:rotate-12" style={{ color }} />
+          <Icon className="h-5 w-5 transition-transform duration-500 group-hover:rotate-12" style={{ color }} />
         </div>
         <h3 className="text-lg font-medium">{title}</h3>
       </CardContent>

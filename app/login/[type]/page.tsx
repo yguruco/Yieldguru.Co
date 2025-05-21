@@ -57,6 +57,13 @@ export default function LoginPage({ params }: { params: { type: string } }) {
           accentColor={dashboardInfo.color}
           passwordRequirements={dashboardInfo.passwordRequirements}
         />
+
+        <div className="mt-6 text-center text-sm text-gray-600">
+          Don't have an account?{" "}
+          <Link href={`/signup/${type}`} className="font-medium" style={{ color: dashboardInfo.color }}>
+            Sign up
+          </Link>
+        </div>
       </div>
     </div>
   )

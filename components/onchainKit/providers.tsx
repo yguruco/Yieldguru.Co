@@ -14,8 +14,8 @@ export function Providers({ children }: { children: ReactNode }) {
         appearance: {
           name: 'YieldGuru', // project name
           logo: yieldguruLogo.src, // Convert StaticImageData to string
-          mode: 'dark', // or 'light', 'dark'
-          theme: 'cyberpunk', // or custom if you define one
+          mode: 'light', // or 'light', 'dark'
+          theme: 'default', // or custom if you define one
         },
         wallet: {
           display: 'modal', // 📱 enable the modal ie other wallets

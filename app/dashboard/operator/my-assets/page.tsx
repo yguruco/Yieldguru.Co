@@ -36,7 +36,7 @@ export default function MyAssetsPage() {
         const assetCards: AssetCard[] = parsedSubmissions.map((sub) => ({
           id: sub.vehicleDetails.id,
           vehicleName: `${sub.vehicleDetails.year} ${sub.vehicleDetails.make} ${sub.vehicleDetails.model}`,
-          vehicleImage: sub.vehicleImages[0] || "/placeholder.svg?height=200&width=300",
+          vehicleImage: sub.vehicleImages[0] || "/placeholder.svg",
           operatorName: sub.vehicleDetails.ownerName,
           vehicleValue: sub.vehicleDetails.value,
           status: sub.status,

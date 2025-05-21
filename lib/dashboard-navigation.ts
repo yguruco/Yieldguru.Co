@@ -1,4 +1,4 @@
-import { BarChart, BookOpen, Car, Home, LineChart, Shield, Truck, Wallet, RefreshCw } from "lucide-react"
+import { BarChart, BookOpen, Car, Home, LineChart, Shield, Truck, Wallet, RefreshCw, MessageSquare } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 interface NavItem {
@@ -15,6 +15,7 @@ export function getNavItems(dashboardType: string): NavItem[] {
     { name: "RFL Approvals", href: "/rfl-approvals", icon: BookOpen },
     { name: "Loan Management", href: "/tokenize", icon: RefreshCw },
     { name: "Create Loan", href: "/create-loan", icon: Wallet },
+    { name: "Contact Messages", href: "/contact-messages", icon: MessageSquare },
   ]
 
   const investorItems = [

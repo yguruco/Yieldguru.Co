@@ -31,10 +31,10 @@ export default function BlogSection() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="relative bg-white py-24 pb-48" id="blog">
+    <section ref={sectionRef} className="relative bg-white py-24 pb-48 overflow-hidden" id="blog">
       {/* Decorative elements */}
-      <div className="absolute -left-16 top-40 h-64 w-64 rounded-full bg-[#4f1964]/5 blur-3xl"></div>
-      <div className="absolute -right-16 top-80 h-64 w-64 rounded-full bg-[#fbdc3e]/5 blur-3xl"></div>
+      <div className="absolute left-0 top-40 h-64 w-64 rounded-full bg-[#4f1964]/5 blur-3xl"></div>
+      <div className="absolute right-0 top-80 h-64 w-64 rounded-full bg-[#fbdc3e]/5 blur-3xl"></div>
 
       {/* Fixed background effect for parallax */}
       <div className="absolute inset-0 bg-white -z-10"></div>
@@ -172,7 +172,7 @@ const blogPosts = [
     title: "The Future of Tokenized EV Loans",
     excerpt:
       "How investing in tokenized EV loans is redesigning commercial EV financing and creating new investment opportunities.",
-    imageSrc: "/images/ford-vehicle.jpeg",
+    imageSrc: "/images/woman.jpeg",
     date: "May 15, 2023",
     readTime: "8 min read",
     category: "Investment",
@@ -181,7 +181,7 @@ const blogPosts = [
   {
     title: "Maximizing Returns on Electric Bus Investments",
     excerpt: "Analysis of yield patterns across public transportation EV assets and strategies for optimizing returns.",
-    imageSrc: "/images/electric-bus.jpeg",
+    imageSrc: "/images/e-bus.jpeg",
     date: "April 28, 2023",
     readTime: "6 min read",
     category: "Strategy",
@@ -191,7 +191,7 @@ const blogPosts = [
     title: "Regulatory Landscape for Tokenized EV Loans",
     excerpt:
       "A comprehensive guide to navigating the evolving regulatory environment for blockchain-based EV loan investments.",
-    imageSrc: "/images/ford.jpeg",
+    imageSrc: "/images/land.jpeg",
     date: "April 10, 2023",
     readTime: "10 min read",
     category: "Compliance",

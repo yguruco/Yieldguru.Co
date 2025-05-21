@@ -182,7 +182,7 @@ export default function AdminLoansPage() {
               <Card className="overflow-hidden h-full flex flex-col">
                 <div className="relative h-48">
                   <Image
-                    src={loan.image || "/placeholder.svg?height=200&width=300"}
+                    src={loan.image || "/placeholder.svg"}
                     alt={loan.name}
                     fill
                     className="object-cover"

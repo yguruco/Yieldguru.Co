@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useToast } from "@/components/ui/use-toast"
+import { loginUser } from "@/lib/auth"
+import { useAuthStore } from "@/lib/auth"
 
 interface LoginFormProps {
   dashboardType: string
@@ -22,7 +25,10 @@ export default function LoginForm({ dashboardType, accentColor, passwordRequirem
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const { toast } = useToast()
+  const login = useAuthStore((state) => state.login)
 
   const validatePassword = (password: string): boolean => {
     // Different validation based on dashboard type
@@ -40,20 +46,51 @@ export default function LoginForm({ dashboardType, accentColor, passwordRequirem
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
 
     if (!validatePassword(password)) {
-      alert("Password does not meet the requirements")
+      setError("Password does not meet the requirements")
       return
     }
 
     setIsLoading(true)
 
-    // Simulate authentication
-    setTimeout(() => {
-      setIsLoading(false)
-      // Use direct route to ensure we're going to the right place
+    try {
+      // Call the login API
+      const userData = await loginUser(email, password)
+
+      // Check if user role matches the dashboard type
+      const roleMap: Record<string, string> = {
+        admin: 'Admin',
+        investor: 'Investor',
+        operator: 'Operator'
+      }
+
+      const expectedRole = roleMap[dashboardType]
+
+      if (userData.role !== expectedRole) {
+        setError(`You don't have permission to access the ${dashboardType} dashboard`)
+        setIsLoading(false)
+        return
+      }
+
+      // Store user data in auth store
+      login(userData)
+
+      // Show success toast
+      toast({
+        title: "Login successful",
+        description: `Welcome back, ${userData.name}`,
+      })
+
+      // Redirect to dashboard
       router.push(`/dashboard/${dashboardType}`)
-    }, 1500)
+    } catch (err: any) {
+      setError(err.message || "Failed to login. Please try again.")
+      console.error("Login error:", err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -112,6 +149,12 @@ export default function LoginForm({ dashboardType, accentColor, passwordRequirem
             </Button>
           </div>
         </div>
+
+        {error && (
+          <div className="rounded-md bg-red-50 p-3 text-sm text-red-500">
+            {error}
+          </div>
+        )}
 
         <Button
           type="submit"

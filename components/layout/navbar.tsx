@@ -9,8 +9,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
@@ -39,11 +37,19 @@ export default function Navbar() {
       <div className="mx-auto flex items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-2">
           <div className="relative h-8 w-8 overflow-hidden">
-            <Image
-              src="/images/YG LOGO.png"
+            <img
+              src="/images/yg-logo.png"
               alt="YieldGuru Logo"
-              fill
-              className="object-contain"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain'
+              }}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.onerror = null;
+                target.src = '/placeholder-logo.svg';
+              }}
             />
           </div>
           <span className={cn("text-lg font-bold", isScrolled ? "text-gray-900" : "text-white")}>YieldGuru</span>
@@ -51,7 +57,7 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center justify-center flex-1">
-          <ul className="flex space-x-16 justify-center">
+          <ul className="flex space-x-8 justify-center">
             {["Features", "Solutions", "Pricing", "Blog"].map((item) => (
               <li key={item}>
                 <Link
@@ -68,8 +74,8 @@ export default function Navbar() {
           </ul>
         </nav>
 
-        {/* Login Button (Desktop) */}
-        <div className="hidden md:block">
+        {/* Login and Signup Buttons (Desktop) */}
+        <div className="hidden md:flex items-center gap-2">
           <Button
             size="sm"
             className={cn(
@@ -80,11 +86,43 @@ export default function Navbar() {
             )}
             asChild
           >
-            <Link href="/login" className="flex items-center gap-1">
+            <Link href="/login/unified" className="flex items-center gap-1">
               <LogIn className="h-4 w-4" />
               <span>Login</span>
             </Link>
           </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="sm"
+                variant="outline"
+                className={cn(
+                  "transition-colors",
+                  isScrolled
+                    ? "border-[#4f1964] text-[#4f1964] hover:bg-[#4f1964]/10"
+                    : "border-white text-[#4f1964] hover:bg-white/10",
+                )}
+              >
+                <UserPlus className="h-4 w-4 mr-1" />
+                <span>Sign Up</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href="/signup/investor" className="flex items-center">
+                  <LineChart className="mr-2 h-4 w-4" />
+                  <span>Investor</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/signup/operator" className="flex items-center">
+                  <Truck className="mr-2 h-4 w-4" />
+                  <span>EV Operator</span>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Mobile Menu Button */}
@@ -118,16 +156,44 @@ export default function Navbar() {
 
 
 
-          <Button
-            className="mt-2 w-full bg-[#4f1964] text-white hover:bg-[#4f1964]/90"
-            onClick={() => setIsMobileMenuOpen(false)}
-            asChild
-          >
-            <Link href="/login" className="flex items-center justify-center gap-1">
-              <LogIn className="h-4 w-4" />
-              <span>Login</span>
-            </Link>
-          </Button>
+          <div className="space-y-2">
+            <Button
+              className="w-full bg-[#4f1964] text-white hover:bg-[#4f1964]/90"
+              onClick={() => setIsMobileMenuOpen(false)}
+              asChild
+            >
+              <Link href="/login/unified" className="flex items-center justify-center gap-1">
+                <LogIn className="h-4 w-4" />
+                <span>Login</span>
+              </Link>
+            </Button>
+
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant="outline"
+                className="border-[#4f1964] text-[#4f1964]"
+                onClick={() => setIsMobileMenuOpen(false)}
+                asChild
+              >
+                <Link href="/signup/investor" className="flex items-center justify-center gap-1">
+                  <LineChart className="h-4 w-4" />
+                  <span>Investor Signup</span>
+                </Link>
+              </Button>
+
+              <Button
+                variant="outline"
+                className="border-[#4f1964] text-[#4f1964]"
+                onClick={() => setIsMobileMenuOpen(false)}
+                asChild
+              >
+                <Link href="/signup/operator" className="flex items-center justify-center gap-1">
+                  <Truck className="h-4 w-4" />
+                  <span>Operator Signup</span>
+                </Link>
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </header>

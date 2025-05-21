@@ -48,14 +48,14 @@ export default function FeaturesSection() {
   // We're now displaying one feature at a time, so we don't need this function anymore
 
   return (
-    <section ref={sectionRef} className="bg-gray-50 py-24" id="solutions">
+    <section ref={sectionRef} className="bg-gray-50 py-6 overflow-hidden" id="solutions">
       <div className="container mx-auto max-w-6xl px-8 sm:px-10 lg:px-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
           viewport={{ once: true }}
-          className="mx-auto mb-16 max-w-3xl text-center"
+          className="mx-auto mb-6 max-w-3xl text-center"
         >
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Why Choose YieldGuru for EV Loan Investments
@@ -90,7 +90,7 @@ export default function FeaturesSection() {
           </div>
 
           {/* Feature card - one at a time */}
-          <div className="overflow-hidden px-4 py-10">
+          <div className="overflow-hidden px-4 py-4">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}

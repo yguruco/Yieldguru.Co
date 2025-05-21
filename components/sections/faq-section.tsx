@@ -104,22 +104,15 @@ export default function FAQSection() {
     <motion.section
       ref={sectionRef}
       style={{ opacity, scale }}
-      className="relative bg-white py-24 -mt-24 mb-24"
+      className="relative bg-white py-24 mb-0"
       id="faq"
     >
-      {/* Clean purple to white transition */}
-      <svg className="absolute top-0 left-0 w-full" height="150" preserveAspectRatio="none" viewBox="0 0 1440 150">
-        <path
-          fill="#4f1964"
-          d="M0 0H1440V100C1440 100 1320 150 720 150C120 150 0 100 0 100V0Z"
-        ></path>
-      </svg>
 
       {/* Decorative elements */}
       <div className="absolute right-0 top-40 h-64 w-64 rounded-full bg-[#4f1964]/5 blur-3xl"></div>
       <div className="absolute left-0 bottom-80 h-64 w-64 rounded-full bg-[#fbdc3e]/5 blur-3xl"></div>
 
-      <div className="container mx-auto max-w-4xl px-8 pt-36 sm:px-10 lg:px-12">
+      <div className="container mx-auto max-w-4xl px-8 pt-8 sm:px-10 lg:px-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -145,7 +138,7 @@ export default function FAQSection() {
         </motion.div>
 
         <motion.div
-          className="mx-auto max-w-3xl pb-36"
+          className="mx-auto max-w-3xl pb-16"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.5, staggerChildren: 0.1 }}

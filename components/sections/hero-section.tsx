@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import Image from "next/image"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion, useScroll, useTransform } from "framer-motion"
+import CustomImage from "@/components/ui/custom-image"
 
 export default function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -17,15 +17,26 @@ export default function HeroSection() {
   const y = useTransform(scrollYProgress, [0, 0.5], [0, 100])
 
   return (
-    <section ref={sectionRef} className="relative flex min-h-screen items-center justify-center">
+    <section ref={sectionRef} className="relative flex min-h-screen items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/electric-bus.jpeg"
-          alt="Electric vehicle on the road"
-          fill
-          className="object-cover object-center brightness-[0.7]"
-          priority
-        />
+        <div style={{ position: 'absolute', width: '100%', height: '100%', overflow: 'hidden' }}>
+          <img
+            src="/images/ke-bus.jpeg"
+            alt="Electric vehicle on the road"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center',
+              filter: 'brightness(0.7)'
+            }}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.onerror = null;
+              target.src = '/placeholder.svg';
+            }}
+          />
+        </div>
         {/* Gradient at the bottom of the hero section */}
         <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/80 to-transparent" />
       </div>
@@ -38,9 +49,9 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="mb-6 text-5xl font-bold tracking-tight text-white sm:text-6xl"
+          className="mb-6 text-6xl font-bold tracking-tight text-white drop-shadow-lg sm:text-7xl"
         >
-          Invest in <span className="relative inline-block h-[60px] overflow-hidden align-bottom sm:h-[72px]">
+          Invest in <span className="relative inline-block h-[72px] overflow-hidden align-bottom sm:h-[84px]">
             <span className="animate-scroll-text absolute left-0 flex flex-col">
               <span className="text-yellow-300">E-Mobility</span>
               <span className="text-yellow-300">Clean Energy</span>
@@ -54,7 +65,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="mb-8 text-xl text-white/90"
+          className="mb-8 text-2xl text-white drop-shadow-md font-medium"
         >
           Yield Guru Investments is pioneering a crowd investing platform into E-mobility assets with quarterly yields. Get fractional ownership in public transport E-Buses, taxi EVs, and our network of charging stations.
         </motion.p>
