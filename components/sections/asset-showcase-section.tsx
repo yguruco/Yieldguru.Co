@@ -8,7 +8,7 @@ export default function AssetShowcaseSection() {
         <div className="mx-auto mb-16 max-w-3xl text-center">
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Diverse EV Asset Classes</h2>
           <p className="text-lg text-gray-600">
-            YieldGuru supports tokenization across the full spectrum of electric vehicles.
+            YieldGuru supports investing in tokenized EV loans across various vehicle classes.
           </p>
         </div>
 

@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { motion } from "framer-motion"
 import {
   BarChart,
@@ -16,6 +17,19 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Check, AlertTriangle } from "lucide-react"
+import { ethers } from "ethers"
+import ViewInvest from "@/app/dashboard/investCard/viewinvest"
+import {
+  useAccount,
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from 'wagmi'
 
 const utilizationData = [
   { day: "Mon", value: 78 },
@@ -37,19 +51,155 @@ const revenueData = [
 ]
 
 export default function OperatorDashboard() {
+  const [error, setError] = useState("")
+  const [txProgress, setTxProgress] = useState(0)
+  const [repayAmount, setRepayAmount] = useState("")
+
+  // Wagmi hooks
+  const { address, isConnected } = useAccount()
+  const { data: hash, isPending, writeContract } = useWriteContract()
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({ hash })
+
+  // Get loan data from contract
+  // const { data: borrowerData } = useReadContract({
+  //   address:LoanContractAddress,
+  //   abi: LoanContractABI,
+  //   functionName: 'borrower',
+  // })
+
+  // const { data: repaymentAmountData } = useReadContract({
+  //   address:LoanContractAddress,
+  //   abi: LoanContractABI,
+  //   functionName: 'repaymentAmount',
+  // })
+
+  // const { data: balanceData } = useReadContract({
+  //   address:LoanContractAddress,
+  //   abi: LoanContractABI,
+  //   functionName: 'getBalance',
+  // })
+
+  // Format loan details
+  // const loanDetails = {
+  //   borrower: borrowerData ? String(borrowerData) : "",
+  //   repaymentAmount: repaymentAmountData ? ethers.formatEther(repaymentAmountData.toString()) : "0",
+  //   balance: balanceData ? ethers.formatEther(balanceData.toString()) : "0"
+  // }
+
+  // // Check if current user is the borrower
+  // const isBorrower = () => {
+  //   return address?.toLowerCase() === loanDetails.borrower.toLowerCase()
+  // }
+
+  // // Repay loan
+  // const repayLoan = () => {
+  //   if (!repayAmount) {
+  //     setError("Please enter an amount to repay")
+  //     return
+  //   }
+
+  //   try {
+  //     setError("")
+  //     writeContract({
+  //       address:LoanContractAddress,
+  //       abi: LoanContractABI,
+  //       functionName: 'repayLoan',
+  //       value: ethers.parseUnits(repayAmount, 18)
+  //     })
+
+  //     if (isConfirmed) {
+  //       setRepayAmount("")
+  //     }
+  //   } catch (err: any) {
+  //     setError(err.message || "Failed to repay loan")
+  //   }
+  // }
+
+  // // Withdraw loan (borrower only)
+  // const withdrawLoan = () => {
+  //   try {
+  //     setError("")
+  //     writeContract({
+  //       address:LoanContractAddress,
+  //       abi: LoanContractABI,
+  //       functionName: 'withdrawLoan',
+  //     })
+  //   } catch (err: any) {
+  //     setError(err.message || "Failed to withdraw loan")
+  //   }
+  // }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="grid gap-6 md:grid-cols-3">
-        <StatCard title="Fleet Utilization" value="85%" description="+7% from last month" delay={0} />
-        <StatCard title="Active Vehicles" value="42/45" description="93.3% operational" delay={0.1} />
-        <StatCard title="Monthly Revenue" value="$16,000" description="+5.3% from projected" delay={0.2} />
+        <StatCard
+          title="Fleet Utilization"
+          value="85%"
+          description="+7% from last month"
+          trend="up"
+          trendValue="7%"
+          className="animate-fade-in-up"
+        />
+        <StatCard
+          title="Active Vehicles"
+          value="42/45"
+          description="93.3% operational"
+          trend="neutral"
+          trendValue="93.3%"
+          className="animate-fade-in-up animation-delay-100"
+        />
+        <StatCard
+          title="Monthly Revenue"
+          value="$16,000"
+          description="+5.3% from projected"
+          trend="up"
+          trendValue="5.3%"
+          className="animate-fade-in-up animation-delay-200"
+        />
       </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="mb-6"
+      >
+        <Card className="border border-[#4f1964]/20">
+          <CardHeader className="bg-[#4f1964]/5">
+            <CardTitle>Loan Management</CardTitle>
+            <CardDescription>Search and manage your EV loans</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <div className="p-4 bg-[#fbdc3e]/5 rounded-md border border-[#fbdc3e]/20 mb-4">
+              <h3 className="text-lg font-semibold mb-2 text-[#4f1964]">Loan Overview</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="mb-2 text-[#4f1964]">
+                  <strong>Active Loans:</strong> 2
+                </div>
+                <div className="mb-2 text-[#4f1964]">
+                  <strong>Total Outstanding:</strong> $58,640
+                </div>
+              </div>
+            </div>
+
+            <Button
+              className="w-full bg-[#4f1964] hover:bg-[#3b1149] text-[#fbdc3e] font-medium border border-[#fbdc3e]/20"
+              asChild
+            >
+              <a href="/dashboard/operator/loan-management">
+                Go to Loan Management
+              </a>
+            </Button>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
           <Card>
             <CardHeader>
@@ -75,7 +225,7 @@ export default function OperatorDashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
         >
           <Card>
             <CardHeader>
@@ -104,7 +254,7 @@ export default function OperatorDashboard() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
       >
         <Card>
           <CardHeader>
@@ -168,19 +318,27 @@ interface StatCardProps {
   delay: number
 }
 
-function StatCard({ title, value, description, delay }: StatCardProps) {
+function StatCard({ title, value, description, delay, trend, trendValue, className }: StatCardProps & { trend?: string, trendValue?: string, className?: string }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay }}>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{value}</div>
-          <p className="text-xs text-muted-foreground">{description}</p>
-        </CardContent>
-      </Card>
-    </motion.div>
+    <Card className={className}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        {trend && trendValue && (
+          <div className={`flex items-center text-xs font-medium px-2 py-1 rounded-full ${
+            trend === "up" ? "bg-green-50 text-green-600" :
+            trend === "down" ? "bg-red-50 text-red-600" :
+            "bg-blue-50 text-blue-600"
+          }`}>
+            {trend === "up" ? "+" : trend === "down" ? "-" : ""}
+            {trendValue}
+          </div>
+        )}
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold tracking-tight">{value}</div>
+        {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
+      </CardContent>
+    </Card>
   )
 }
 
@@ -209,6 +367,21 @@ function VehicleStatusCard({ id, type, battery, status, location, lastMaintenanc
     }
   }
 
+  const getStatusBgColor = () => {
+    switch (status) {
+      case "Active":
+        return "bg-green-50 border-green-100"
+      case "Charging":
+        return "bg-blue-50 border-blue-100"
+      case "Maintenance":
+        return "bg-orange-50 border-orange-100"
+      case "Inactive":
+        return "bg-red-50 border-red-100"
+      default:
+        return "bg-gray-50 border-gray-100"
+    }
+  }
+
   const getBatteryColor = () => {
     if (battery > 70) return "bg-green-500"
     if (battery > 30) return "bg-yellow-500"
@@ -216,21 +389,21 @@ function VehicleStatusCard({ id, type, battery, status, location, lastMaintenanc
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className={`flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between transition-all duration-300 hover:shadow-md ${getStatusBgColor()} hover:border-gray-300 group`}>
       <div>
         <div className="flex items-center gap-2">
-          <h3 className="font-medium">{id}</h3>
-          <Badge variant="outline">{type}</Badge>
-          <Badge className={getStatusColor()}>{status}</Badge>
+          <h3 className="font-medium group-hover:text-[#f68b27] transition-colors">{id}</h3>
+          <Badge variant="outline" className="bg-white">{type}</Badge>
+          <Badge className={`${getStatusColor()} shadow-sm`}>{status}</Badge>
         </div>
         <div className="mt-2 flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:gap-4">
-          <span>Location: {location}</span>
-          <span>Last Maintenance: {lastMaintenance}</span>
+          <span>Location: <span className="font-medium">{location}</span></span>
+          <span>Last Maintenance: <span className="font-medium">{lastMaintenance}</span></span>
         </div>
       </div>
       <div className="flex w-full items-center gap-2 sm:w-48">
-        <span className="text-sm">{battery}%</span>
-        <Progress value={battery} className={getBatteryColor()} />
+        <span className="text-sm font-medium">{battery}%</span>
+        <Progress value={battery} className={`${getBatteryColor()} h-2.5 transition-all duration-300 group-hover:h-3`} />
       </div>
     </div>
   )

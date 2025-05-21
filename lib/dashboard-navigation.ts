@@ -1,4 +1,4 @@
-import { BarChart, BookOpen, Car, Home, LineChart, Shield, Truck, Users, Wallet, Droplets } from "lucide-react"
+import { BarChart, BookOpen, Car, Home, LineChart, Shield, Truck, Wallet, RefreshCw, MessageSquare } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 interface NavItem {
@@ -11,26 +11,21 @@ export function getNavItems(dashboardType: string): NavItem[] {
   const baseItems = [{ name: "Overview", href: "", icon: Home }]
 
   const adminItems = [
-    { name: "Users", href: "/users", icon: Users },
     { name: "Assets", href: "/assets", icon: Wallet },
-    { name: "RFT Approvals", href: "/rft-approvals", icon: BookOpen },
-    { name: "Tokenize", href: "/tokenize", icon: Shield },
-    { name: "Liquidity Pool", href: "/liquidity-pool", icon: Droplets },
-    
+    { name: "RFL Approvals", href: "/rfl-approvals", icon: BookOpen },
+    { name: "Loan Management", href: "/tokenize", icon: RefreshCw },
+    { name: "Create Loan", href: "/create-loan", icon: Wallet },
+    { name: "Contact Messages", href: "/contact-messages", icon: MessageSquare },
   ]
 
   const investorItems = [
     { name: "Portfolio", href: "/portfolio", icon: LineChart },
     { name: "Marketplace", href: "/marketplace", icon: BarChart },
-    { name: "Liquidity Pool", href: "/liquidity-pool", icon: Droplets },
   ]
 
   const operatorItems = [
-    { name: "Fleet", href: "/fleet", icon: Truck },
-    { name: "Performance", href: "/performance", icon: Shield },
-    { name: "RFT", href: "/rft", icon: BookOpen },
-    { name: "My Assets", href: "/my-assets", icon: Car },
-    { name: "Liquidity Pool", href: "/liquidity-pool", icon: Droplets },
+    { name: "Loan Management", href: "/loan-management", icon: RefreshCw },
+    { name: "RFL", href: "/rfl", icon: BookOpen },
   ]
 
   switch (dashboardType) {

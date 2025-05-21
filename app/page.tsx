@@ -8,16 +8,20 @@ import DashboardSection from "@/components/sections/dashboard-section"
 import FeaturesSection from "@/components/sections/features-section"
 import AssetShowcaseSection from "@/components/sections/asset-showcase-section"
 import TestimonialsSection from "@/components/sections/testimonials-section"
+import FAQSection from "@/components/sections/faq-section"
 import CTASection from "@/components/sections/cta-section"
 import BlogSection from "@/components/sections/blog-section"
 import FooterSection from "@/components/sections/footer-section"
-
+import FoundersSection from "@/components/sections/founders-section"
+import ContactSection from "@/components/sections/contact-section"
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />
+
       <HeroSection />
       <DashboardSection />
+
       <FeaturesSection />
       {/* <CTASection /> */}
 
@@ -32,6 +36,9 @@ export default function Home() {
 
       <BlogSection />
       <TestimonialsSection />
+      <FoundersSection />
+      <FAQSection />
+      <ContactSection />
       <FooterSection />
     </div>
   )

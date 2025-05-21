@@ -38,7 +38,7 @@ export default function MyAssetsPage() {
           id: sub.vehicleDetails.id,
           _id: sub._id,
           vehicleName: `${sub.vehicleDetails.year} ${sub.vehicleDetails.make} ${sub.vehicleDetails.model}`,
-          vehicleImage: sub.vehicleImages[0] || "/placeholder.svg?height=200&width=300",
+          vehicleImage: sub.vehicleImages[0] || "/placeholder.svg",
           operatorName: sub.vehicleDetails.ownerName,
           vehicleValue: sub.vehicleDetails.value,
           status: sub.status,
