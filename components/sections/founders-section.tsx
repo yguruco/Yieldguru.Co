@@ -130,28 +130,28 @@ const founders = [
     name: "Eliud Mwangi",
     title: "CEO & Founder",
     imageSrc: "/images/eliud.jpeg",
-    linkedin: "https://www.linkedin.com/in/mndeto/",
+    linkedin: "https://www.linkedin.com/in/eliudmungai/ ",
     email: "eliud@yieldguru.co"
   },
   {
     name: "Martin",
     title: "CTO",
     imageSrc: "/images/martin.jpeg",
-    linkedin: "https://www.linkedin.com/in/jane-njoroge/",
+    linkedin: "https://www.linkedin.com/in/mndeto/",
     email: "martin@yieldguru.co"
   },
   {
     name: "Joshua",
     title: "CFO",
     imageSrc: "/images/joshua.jpeg",
-    linkedin: "https://www.linkedin.com/in/david-kimani/",
+    linkedin: "https://www.linkedin.com/in/joshua-mutuku/ ",
     email: "joshua@yieldguru.co"
   },
   {
     name: "Dennis",
-    title: "E-Mobility Expert",
+    title: "E-Mobility Advisor",
     imageSrc: "/images/dennis.jpeg",
-    linkedin: "https://www.linkedin.com/in/david-kimani/",
+    linkedin: "https://www.linkedin.com/in/dennis-wakaba-a4083043/ ",
     email: "dennis@yieldguru.co"
   }
 ]
