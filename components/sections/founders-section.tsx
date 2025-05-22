@@ -3,7 +3,7 @@
 import { useRef } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { Card, CardContent } from "@/components/ui/card"
-import { Mail } from "lucide-react"
+import { Twitter } from "lucide-react"
 
 export default function FoundersSection() {
   const sectionRef = useRef<HTMLElement>(null)
@@ -74,10 +74,10 @@ interface FounderCardProps {
   title: string
   imageSrc: string
   linkedin?: string
-  email?: string
+  twitter?: string
 }
 
-function FounderCard({ name, title, imageSrc, linkedin, email }: FounderCardProps) {
+function FounderCard({ name, title, imageSrc, linkedin, twitter }: FounderCardProps) {
   return (
     <Card className="h-full overflow-hidden transition-all duration-300 hover:shadow-md bg-white border-none">
       <CardContent className="p-0">
@@ -110,12 +110,14 @@ function FounderCard({ name, title, imageSrc, linkedin, email }: FounderCardProp
                 </svg>
               </a>
             )}
-            {email && (
+            {twitter && (
               <a
-                href={`mailto:${email}`}
+                href={twitter}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-[#4f1964] hover:bg-[#4f1964] hover:text-white transition-all duration-300"
               >
-                <Mail className="h-3 w-3" />
+                <Twitter className="h-3 w-3" />
               </a>
             )}
           </div>
@@ -127,31 +129,31 @@ function FounderCard({ name, title, imageSrc, linkedin, email }: FounderCardProp
 
 const founders = [
   {
-    name: "Eliud Mwangi",
+    name: "Eliud ",
     title: "CEO & Founder",
     imageSrc: "/images/eliud.jpeg",
-    linkedin: "https://www.linkedin.com/in/eliudmungai/ ",
-    email: "eliud@yieldguru.co"
+    linkedin: "https://www.linkedin.com/in/mndeto/",
+    twitter: "https://x.com/elmoonguy"
   },
   {
     name: "Martin",
     title: "CTO",
     imageSrc: "/images/martin.jpeg",
     linkedin: "https://www.linkedin.com/in/mndeto/",
-    email: "martin@yieldguru.co"
+    twitter: "https://x.com/0xNdeto"
   },
   {
     name: "Joshua",
     title: "CFO",
     imageSrc: "/images/joshua.jpeg",
-    linkedin: "https://www.linkedin.com/in/joshua-mutuku/ ",
-    email: "joshua@yieldguru.co"
+    linkedin: "https://www.linkedin.com/in/joshua-mutuku/",
+    twitter: "https://x.com/yield_guru"
   },
   {
     name: "Dennis",
-    title: "E-Mobility Advisor",
+    title: "E-Mobility Expert",
     imageSrc: "/images/dennis.jpeg",
-    linkedin: "https://www.linkedin.com/in/dennis-wakaba-a4083043/ ",
-    email: "dennis@yieldguru.co"
+    linkedin: "https://www.linkedin.com/in/dennis-wakaba-a4083043/",
+    twitter: "https://x.com/plannerwakaba"
   }
 ]

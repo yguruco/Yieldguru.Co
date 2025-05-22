@@ -91,6 +91,6 @@ const testimonials = [
     quote:
       "We are working with YieldGuru to launch the first National EV Buses Sacco in Kenya. We will enable our members transition 100% to electric buses, with cheaper financing alternatives",
     author: "Bernard Odero",
-    title: "Chairman - Kenya Bus Operators Association",
+    title: "Chairman - National Electric Mobility SACCO",
   }
 ]

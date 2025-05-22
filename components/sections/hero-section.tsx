@@ -51,14 +51,14 @@ export default function HeroSection() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="mb-6 text-6xl font-bold tracking-tight text-white drop-shadow-lg sm:text-7xl"
         >
-          Invest in <span className="relative inline-block h-[72px] overflow-hidden align-bottom sm:h-[84px]">
+          Invest in Electric Mobility<span className="relative inline-block h-[72px] overflow-hidden align-bottom sm:h-[84px]">
             <span className="animate-scroll-text absolute left-0 flex flex-col">
               <span className="text-yellow-300">E-Mobility</span>
               <span className="text-yellow-300">Clean Energy</span>
               <span className="text-yellow-300">The Future</span>
               <span className="text-yellow-300">Sustainability</span>
               <span className="text-yellow-300">E-Mobility</span>
-            </span>
+            </span> 
           </span> with <span className="text-yellow-300">Simplicity</span>
         </motion.h1>
         <motion.p
