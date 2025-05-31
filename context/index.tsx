@@ -31,11 +31,30 @@ const modal = createAppKit({
   enableCoinbase: true,
   coinbasePreference: "smartWalletOnly",
   enableNetworkSwitch: false,
+  enableWalletGuide: true, 
   metadata: metadata,
+  themeMode: 'light', 
+  themeVariables: {
+    '--w3m-accent': '#4f1964',           // Purple as primary accent
+    '--w3m-color-mix': '#fbdc3e',        // Yellow for color mixing
+    '--w3m-color-mix-strength': 15,      // 15% blend strength
+    '--w3m-font-family': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    '--w3m-font-size-master': '12px',    // Base font size
+    '--w3m-border-radius-master': '2px', // Rounded corners
+    '--w3m-z-index': 1000                // Modal z-index
+  },
   features: {
     analytics: true, // Optional - defaults to your Cloud configuration
     connectMethodsOrder: ["email","social","wallet"], 
     collapseWallets: true, // Optional - defaults to false
+    onramp: false,
+    pay: false,
+    send: false,
+    swaps: false,
+    receive: true,
+    history: false,
+    emailShowWallets: false
+    
   }
 })
 
