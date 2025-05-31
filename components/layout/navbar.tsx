@@ -58,7 +58,7 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center justify-center flex-1">
           <ul className="flex space-x-8 justify-center">
-            {["Features", "Solutions", "Pricing", "Blog"].map((item) => (
+            {["Features", "Solutions", "Blog", "Team", "Contact"].map((item) => (
               <li key={item}>
                 <Link
                   href={`#${item.toLowerCase()}`}
@@ -140,7 +140,7 @@ export default function Navbar() {
         <div className="absolute left-1/2 right-auto top-[calc(100%+0.75rem)] w-[90%] -translate-x-1/2 rounded-xl bg-white p-4 shadow-lg md:hidden">
           <nav className="mb-6">
             <ul className="space-y-5">
-              {["Features", "Solutions", "Pricing", "Blog"].map((item) => (
+              {["Features", "Solutions", "Blog", "Team", "Contact"].map((item) => (
                 <li key={item}>
                   <Link
                     href={`#${item.toLowerCase()}`}

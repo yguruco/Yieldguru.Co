@@ -1,6 +1,7 @@
 import { StatCard } from "@/components/ui/stat-card"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowUpRight } from "lucide-react"
+import  ConnectButton  from "../../../reown-appkit/ConnectButton"
 import Link from "next/link"
 
 export default function AdminDashboardPage() {
@@ -10,6 +11,7 @@ export default function AdminDashboardPage() {
         <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
         <p className="text-muted-foreground">Manage tokenized EV loans platform</p>
       </div>
+      {/* <ConnectButton /> */}
       
       <div className="grid gap-6 md:grid-cols-3">
         <StatCard title="Total Assets" value="1,245" description="+12% from last month" />

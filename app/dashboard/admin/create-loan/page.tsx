@@ -18,7 +18,7 @@ import type { RFLSubmission } from "@/types/rfl"
 // import { MintNFT } from "@/components/AdminNFT"
 import { CreateLoanForm } from "@/components/CreateLoanForm"
 // import { LoanEventsDisplay } from "@/components/LoanEventsDisplay"
-import ClientWallet from "@/components/onchainKit/ClientWallet"
+import ClientWallet from "@/reown-appkit/ClientWallet"
 import { LoanList } from "@/components/LoanList"
 
 export default function CreateLoanPage() {

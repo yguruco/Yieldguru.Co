@@ -5,7 +5,7 @@ import { ContractCard } from "@/components/ContractCard"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { PlusCircle, Trash2 } from "lucide-react"
-import { WalletComponents } from "@/components/onchainKit/wallet"
+import { WalletComponents } from "@/reown-appkit/wallet"
 import { isAddress } from "viem"
 
 export default function ViewInvest() {

@@ -25,7 +25,7 @@ import {
   useWaitForTransactionReceipt 
 } from "wagmi"
 import { formatEther, parseEther } from "viem"
-import { WalletComponents } from "./onchainKit/wallet"
+import { WalletComponents } from "../reown-appkit/wallet"
 
 interface ContractCardProps {
   contractAddress: string
