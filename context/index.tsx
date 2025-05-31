@@ -28,9 +28,14 @@ const modal = createAppKit({
   projectId,
   networks: [baseSepolia ],
   defaultNetwork: baseSepolia,
+  enableCoinbase: true,
+  coinbasePreference: "smartWalletOnly",
+  enableNetworkSwitch: false,
   metadata: metadata,
   features: {
-    analytics: true // Optional - defaults to your Cloud configuration
+    analytics: true, // Optional - defaults to your Cloud configuration
+    connectMethodsOrder: ["email","social","wallet"], 
+    collapseWallets: true, // Optional - defaults to false
   }
 })
 
